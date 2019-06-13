@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>任务列表</title>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+
+    <link href="${s.base}/media/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="${s.base}/media/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css"/>
+    <link href="${s.base}/media/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="${s.base}/media/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="${s.base}/media/css/style-responsive.css" rel="stylesheet" type="text/css"/>
+    <link href="${s.base}/media/css/light.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="${s.base}/i/ico.png" sizes="16x16">
+    <!-- BEGIN PAGE LEVEL STYLES -->
+    <link href="${s.base}/res/css/plane.css" rel="stylesheet" type="text/css"/>
+
+    <link href="${s.base}/media/css/style-metro.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="${s.base}/media/css/select2_metro.css"/>
+    <link rel="stylesheet" href="${s.base}/media/css/DT_bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="${s.base}/media/css/bootstrap-toggle-buttons.css"/>
+
+    <!-- END PAGE LEVEL STYLES -->
+    <link href="${s.base}/media/css/glyphicons.css" rel="stylesheet"/>
+    <link href="${s.base}/media/css/halflings.css" rel="stylesheet"/>
+
+    <script src="${s.base}/media/js/jquery-1.10.1.min.js" type="text/javascript"></script>
+    <script src="${s.base}/media/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="${s.base}/media/js/app.js" type="text/javascript"></script>
+    <script src="${s.base}/res/js/plane.js" type="text/javascript"></script>
+    <style>
+        .listlabel span {
+            width: 80px;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="page-header-fixed">
+<#include "common/header.html" />
+<div class="page-container">
+    <#include "common/nav.html" />
+
+    <div class="page-content">
+        <!-- BEGIN PAGE CONTAINER-->
+        <div class="container-fluid">
+            <!--  下面这块内容是在页面写死的  -->
+        <#--<h4 class="page-title">我的任务
+             <small>任务一览</small>
+         </h4>-->
+            <h4 class="page-title"></h4>
+
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home"></i>
+                    <a href="#">我的任务</a>
+                    <i class="icon-angle-right"></i>
+                </li>
+                <li><a href="${s.base}/taskPageList.action">任务一览</a></li>
+            </ul>
+        </div>
+        <!-- END PAGE TITLE & BREADCRUMB-->
+        <div id="dashboard">
+            <!-- 填充内容 start-->
+            <div class="container-fluid">
+                <div class="row-fluid" style="width:90%;margin:20px 30px;">
+                    <form id="queryPageForm" class="mt-15">
+                        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                        <div class="portlet box yellow">
+                            <div class="portlet-title">
+                                <div class="caption"><i class="icon-edit"></i>工单列表</div>
+
+                            </div>
+                            <div class="portlet-body">
+                                <div class="" style="float: right;">
+                                    <select name="finishstatus" class="select2-container" style="margin-bottom: 8px;">
+                                        <option value=-1>全部</option>
+                                        <option value=1
+                                                <#if (selectStatus)?? && selectStatus ==1>selected="selected"</#if> >已完成
+                                        </option>
+                                        <option value=0
+                                                <#if (selectStatus)?? && selectStatus ==0>selected="selected"</#if> >未完成
+                                        </option>
+                                    </select>
+                                    <input name="name" type="text" value="${inputName!}" class="search-text"
+                                           placeholder=" 请输入任务名称" style="margin-bottom: 8px;">
+                                    <input type="submit" class="btn green" value="搜索"
+                                           style="height: 30px;margin-bottom: 8px;">
+                                <!-- <button type="button" id="timeReverseView" class="btn red " style="height: 30px;margin-bottom: 8px;">创建时间逆序查看</button>-->
+                                </div>
+                                <table class="table table-striped table-hover table-bordered dataTable "
+                                       id="sample_editable_1">
+                                    <thead>
+                                    <tr>
+                                        <th>任务编号</th>
+                                        <th>任务名称</th>
+                                        <th>机器人名称</th>
+                                        <th>设备编号</th>
+                                        <th>创建时间</th>
+                                        <th>计划执行时间</th>
+                                        <th>计划完成时间</th>
+                                        <th>巡检路线</th>
+                                        <th>任务状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <#if page.items?exists && ((page.items)?size gt 0)>
+                                        <#list page.items as taskpojo>
+                                            <tr>
+                                                <td>${taskpojo.task.id!}</td>
+                                                <td>${taskpojo.task.name!}</td>
+                                                <td>
+                                                    <#if taskpojo.task.status == 9>
+                                                        <a target="_blank"
+                                                           href="${s.base}/getTaskPlaneLocation?uavid=${taskpojo.task.uavId!}&taskid=${taskpojo.task.id!}"
+                                                           style="cursor:pointer;">${taskpojo.uavName!}</a>
+                                                    <#else>${taskpojo.uavName!}
+                                                    </#if>
+                                                </td>
+                                                <td>${taskpojo.deviceId!}</td>
+                                                <td>${(taskpojo.task.createtime?datetime)!}</td>
+                                                <td>${(taskpojo.task.planstarttime?datetime)!}</td>
+                                                <td>${(taskpojo.task.planendtime?datetime)!}</td>
+                                                <td>
+                                                    <a href="${s.base}/alarmWithId.action?id=${taskpojo.task.id!}"
+                                                       target="_blank">${taskpojo.flyingPathName!}</a>
+                                                </td>
+                                                <td class="listlabel">
+                                                    <#if taskpojo.task.status??>
+                                                        <#if  taskpojo.task.status == -1><span
+                                                                class="label label-danger">故障或异常</span>
+                                                        <#elseif taskpojo.task.status == 0><span
+                                                                class="label label-warning">任务创建中</span>
+                                                        <#elseif taskpojo.task.status == 1><span
+                                                                class="label label-primary">任务已提交</span>
+                                                        <#elseif taskpojo.task.status == 2><span
+                                                                class="label label-primary">任务已分派</span>
+                                                        <#elseif taskpojo.task.status == 3><span
+                                                                class="label label-primary">放飞员已确认</span>
+                                                        <#elseif taskpojo.task.status == 4><span
+                                                                class="label label-info">接机员已确认</span>
+                                                        <#elseif taskpojo.task.status == 5><span
+                                                                class="label label-info">机器人自检</span>
+                                                        <#elseif taskpojo.task.status == 6><span
+                                                                class="label label-success">机器人待执行</span>
+                                                        <#elseif taskpojo.task.status == 7><span
+                                                                class="label label-primary">执行待批准</span>
+                                                        <#elseif taskpojo.task.status == 8><span
+                                                                class="label label-info">批准</span>
+                                                        <#elseif taskpojo.task.status == 9><span
+                                                                class="label label-success">巡检中</span>
+                                                        <#elseif taskpojo.task.status == 10><span
+                                                                class="label label-success">巡检完成</span>
+                                                        <#elseif taskpojo.task.status == 11><span
+                                                                class="label label-success">传图识别中</span>
+                                                        <#elseif taskpojo.task.status == 12><span
+                                                                class="label label-success">识别完成</span>
+                                                        <#elseif taskpojo.task.status == 13><span
+                                                                class="label label-success">完成任务</span>
+                                                        <#elseif taskpojo.task.status == 14><span
+                                                                class="label label-success">已归档</span>
+                                                        </#if>
+                                                    </#if>
+                                                </td>
+                                                <td>
+                                                   <#if  taskpojo.task.status==1>
+                                                       <#if !Session["super_administrator"]?exists>
+                                                           <button type="button" class="btn green"
+                                                                   onclick="assignTask(${taskpojo.task.id!})">
+                                                               <i class="icon-signin icon-white"></i>
+                                                               <span>分派</span>
+                                                           </button>
+                                                       <button type="button" class="btn blue"
+                                                               onclick="cancelTask(${taskpojo.task.id!})">
+                                                           <i class="icon-remove-sign icon-white"></i>
+                                                           <span>取消</span>
+                                                       </button>
+                                                       <#else>
+                                                         <span class="label label-warning">无操作权限</span>
+                                                       </#if>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status==-1 >
+                                                       <#if !Session["super_administrator"]?exists>
+                                                    <button type="button" class="btn green"
+                                                            onclick="reStartTask(${taskpojo.task.id!})">
+                                                        <i class="icon-share-alt icon-white"></i>
+                                                        <span>重启</span>
+                                                    </button>
+                                                       <#--<button type="button" class="btn blue" onclick="cancelTask(${taskpojo.task.id!})">取消</button>-->
+                                                       <#else>
+                                                     <span class="label label-warning">无操作权限</span>
+                                                       </#if>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status==0>
+                                                       <#if !Session["super_administrator"]?exists>
+                                                        <button type="button" class="btn blue"
+                                                                onclick="toedit(${taskpojo.task.id!})">
+                                                            <i class="icon-edit icon-white"></i>
+                                                            <span>编辑</span>
+                                                        </button>
+
+                                                        <button type="button" class="btn red"
+                                                                onclick="deleteTask(${taskpojo.task.id!})">
+                                                            <i class=" icon-trash icon-white"></i>
+                                                            <span>删除</span>
+                                                        </button>
+                                                       <#else>
+                                                         <span class="label label-warning">无操作权限</span>
+                                                       </#if>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status==10>
+                                                       <#if !Session["super_administrator"]?exists>
+                                                            <button type="button" class="btn blue start"
+                                                                    onclick="uploadPic(${taskpojo.task.missionId!})">
+                                                                <i class="icon-upload icon-white"></i>
+                                                                <span>传图</span>
+                                                            </button>
+                                                            <button type="button" class="btn green"
+                                                                    onclick="taskImage(${taskpojo.task.id!})">
+                                                                <i class="icon-camera-retro"></i>
+                                                                <span class="glyphicon glyphicon-picture"
+                                                                      aria-hidden="true">图片</span>
+                                                            </button>
+                                                            <button type="button" class="btn red delete"
+                                                                    onclick="recongizePic('${taskpojo.task.name!}',${taskpojo.task.id!})">
+                                                                <i class="icon-camera icon-white"></i>
+                                                                <span class="glyphicon glyphicon-picture"
+                                                                      aria-hidden="true">识别</span>
+                                                            </button>
+                                                       <#else>
+                                                            <span class="label label-warning">无操作权限</span>
+                                                       </#if>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status==7>
+                                                       <#if !Session["super_administrator"]?exists>
+                                                        <button type="button" class="btn green"
+                                                                onclick="onsureFly('${taskpojo.task.id!}')">
+                                                            <i class="icon-ok icon-white"></i>
+                                                            <span>批准</span>
+                                                        </button>
+                                                        <button type="button" class="btn blue btn-xs"
+                                                                onclick="rejectFly('${taskpojo.task.id!}')">
+                                                            <i class="icon-remove icon-white"></i>
+                                                            <span>驳回</span>
+                                                        </button>
+                                                       <#else>
+                                                        <span class="label label-warning">无操作权限</span>
+                                                       </#if>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status==12>
+                                                        <button type="button" class="btn red delete"
+                                                                onclick="taskAlarm(${taskpojo.task.id!})"
+                                                                style="cursor:pointer;">
+                                                            <i class="icon-exclamation-sign"></i>
+                                                            <span class="glyphicon glyphicon-picture"
+                                                                  aria-hidden="true">告警</span></button>
+                                                        <button type="button" class="btn green"
+                                                                onclick="taskImage(${taskpojo.task.id!})">
+                                                            <i class="icon-camera-retro"></i>
+                                                            <span class="glyphicon glyphicon-picture"
+                                                                  aria-hidden="true">图片</span>
+                                                        </button>
+                                                         <button type="button" class="btn default"
+                                                                 onclick="getReport('${s.base}/taskReport.action?id=${taskpojo.task.id!}')">
+                                                             <i class=" icon-print icon-white"></i>
+                                                             <span class="glyphicon glyphicon-picture"
+                                                                   aria-hidden="true">报告</span>
+                                                         </button>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status==14>
+                                                         <button type="button" class="btn default"
+                                                                 onclick="getReport('${s.base}/taskReport.action?id=${taskpojo.task.id!}')">
+                                                             <i class=" icon-print icon-white"></i>
+                                                             <span class="glyphicon glyphicon-picture"
+                                                                   aria-hidden="true">报告</span>
+                                                         </button>
+                                                   </#if>
+
+                                                   <#if taskpojo.task.status=13>
+                                                       <#if !Session["super_administrator"]?exists>
+                                                           <button type="button" class="btn blue"
+                                                                   onclick="finishTask(${taskpojo.task.id!})">
+                                                               <i class="icon-save icon-white"></i>
+                                                               <span class="glyphicon glyphicon-picture"
+                                                                     aria-hidden="true">归档</span>
+                                                           </button>
+                                                             <button type="button" class="btn default"
+                                                                     onclick="getReport('${s.base}/taskReport.action?id=${taskpojo.task.id!}')">
+                                                                 <i class=" icon-print icon-white"></i>
+                                                                 <span class="glyphicon glyphicon-picture"
+                                                                       aria-hidden="true">报告</span>
+                                                             </button>
+                                                       <#else>
+                                                        <span class="label label-warning">无操作权限</span>
+                                                       </#if>
+                                                   </#if>
+
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                        </#if>
+                                    </tbody>
+                                </table>
+                                <p><#include "common/tailPage.html"/></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 等待模态框 -->
+<div class="modal fade" id="waitModal" tabindex="-1" aria-hidden="hide">
+    <div class="modal_wapper small">
+        <div class="modal-dialog w-4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button> 
+                    <h4 class="modal-title">提示信息</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="width:70%;font-size:1.2rem;float:left;" class="color-oc f-16 oc-content">
+                      <span id="taskName"></span><br>           
+                       <span>任务正在识别中，请稍等...</span> 
+                    </div>
+                    <div style="width:20%;float:right;">                    
+                     <img alt="" src="${s.base}/res/media/image/ajax-loading.gif" >                 
+                    </div> 
+                </div>            
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 提示信息模态框 -->
+<div class="modal fade" id="ocDialogModal" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper small">
+        <div class="modal-dialog w-4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">提示信息</h4>
+                </div>
+                <div class="modal-body">
+                    <div><span class="color-oc f-16 oc-content" style="font-size:1.2rem;" id="resText">任务完成，打印报告</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 任务派发确认 -->
+<div class="modal fade" id="assignfirmModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">派发确认</h4>
+            </div>
+            <div class="modal-body" style="font-size:1.2rem;">
+                <p id="tip">您确认要派发该任务吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <a onclick="assign()" class="btn red" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+        <input type="text" id="assignTaskId" style="display:none"/>
+    </div>
+</div>
+<!-- 任务派发确认 -->
+
+<!-- 任务重启确认 -->
+<div class="modal fade" id="reStartTaskModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">重启确认</h4>
+            </div>
+            <div class="modal-body" style="font-size:1.2rem;">
+                <p id="tip">您确认要重启该任务吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <a onclick="restart()" class="btn red" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+        <input type="text" id="reStartTaskId" style="display:none"/>
+    </div>
+</div>
+<!-- 任务重启确认 -->
+<!-- 任务取消确认 -->
+<div class="modal fade" id="cancelfirmModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">取消确认</h4>
+            </div>
+            <div class="modal-body" style="font-size:1.2rem;">
+                <p id="tip">您确认要取消该任务吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <a onclick="cancel()" class="btn red" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+        <input type="text" id="cancelTaskId" style="display:none"/>
+    </div>
+</div>
+<!-- 任务取消确认 -->
+<!-- 任务归档确认 -->
+<div class="modal fade" id="finishModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">归档确认</h4>
+            </div>
+            <div class="modal-body" style="font-size:1.2rem;">
+                <p id="tip">您确认要归档该任务吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <a onclick="finishTaskById()" class="btn red" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+        <input type="text" id="finishTaskId" style="display:none"/>
+    </div>
+</div>
+<!-- 任务归档确认 -->
+<!-- 任务批准起飞确认 -->
+<div class="modal fade" id="onsureFlyModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">起飞批准确认</h4>
+            </div>
+            <div class="modal-body" style="font-size:1.2rem;">
+                <p id="tip">您确认要起飞吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <a onclick="onsureFlyByTaskId()" class="btn red" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+        <input type="text" id="onsureFlyTaskId" style="display:none"/>
+    </div>
+</div>
+<!-- 任务批准起飞确认 -->
+<!-- 信息删除确认 -->
+<div class="modal fade" id="deleltconfirmModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">删除确认</h4>
+            </div>
+            <div class="modal-body" style="font-size:1.2rem;">
+                <p id="tip">您确认要删除该任务吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <a onclick="urlSubmit()" class="btn red" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+        <input type="text" id="taskid" style="display:none"/>
+    </div>
+</div>
+<!-- 信息删除确认 -->
+</div>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        App.init();
+         
+    });
+
+    function recongizePic(name,taskid) {
+    	
+    	$("#taskName").html(name);
+    	Modal.show('waitModal');
+        $.ajax({
+            type: "post",
+            url: "${s.base}/recongize.action",
+            data: {
+                'id': taskid
+            },
+            success: function (result) {
+                if (result.errcode == 0) {
+                	Modal.hide('waitModal');
+                    document.getElementById("resText").innerHTML = result.message
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 2000);
+                }
+            },
+            error: function () { 	
+            }
+        });
+    }
+
+    function uploadPic(missionId) {
+        window.open("${s.base}/picture/" + missionId);   //打开新窗口上传图片
+    }
+
+    function alarmMap(url) {
+        window.open(url);   //打开新窗口显示告警
+    }
+
+    function toedit(taskId) {
+    	
+        window.location.href = '${s.base}/toTaskCreate.action?id=' + taskId;
+    }
+
+    function getReport(url) {
+        window.open(url);
+    }
+
+    //显示任务告警
+    function showAlarm(taskid) {
+        $.ajax({
+            type: "GET",
+            url: "${s.base}/alarmWithId.action",
+            data: {
+                'id': taskid
+            },
+            success: function (result) {
+            }
+        });
+    }
+
+    function assign() {
+    	
+        $.ajax({
+            type: "post",
+            url: "${s.base}/assignTask.action",
+            data: {
+                'id': $('#assignTaskId').val(),
+            },
+            success: function (result) {
+
+                if (result.errcode == 1) {
+                    document.getElementById("resText").innerHTML = result.message
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 2000);
+                }
+            }
+        });
+
+    }
+
+    function restart() {
+        $.ajax({
+            type: "post",
+            url: "${s.base}/reStartTask.action",
+            data: {
+                'id': $('#reStartTaskId').val(),
+            },
+            success: function (result) {
+
+                if (result.errcode == 1) {
+                    document.getElementById("resText").innerHTML = result.message
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 2000);
+                }
+            }
+        });
+
+    }
+
+    //归档任务
+    function finishTaskById() {
+        $.ajax({
+            type: "post",
+            url: "${s.base}/finishTask.action",
+            data: {
+                'id': $('#finishTaskId').val(),
+            },
+            success: function (result) {
+
+                if (result.errcode == 1) {
+                    document.getElementById("resText").innerHTML = result.message
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 2000);
+                }
+            }
+        });
+    }
+
+    //归档任务
+    function finishTask(taskid) {
+
+        $('#finishTaskId').val(taskid);
+        Modal.show('finishModel');
+    }
+
+    //分派任务
+    function assignTask(taskid) {
+
+        $('#assignTaskId').val(taskid);
+        Modal.show('assignfirmModel');
+    }
+
+    //取消任务
+    function cancelTask(taskid) {
+
+        $('#cancelTaskId').val(taskid);
+        Modal.show('cancelfirmModel');
+    }
+
+    //重启任务
+    function reStartTask(taskid) {
+        $('#reStartTaskId').val(taskid);
+        Modal.show('reStartTaskModel');
+    }
+
+    //起飞确认
+    function onsureFly(taskid){
+    	$('#onsureFlyTaskId').val(taskid);
+    	Modal.show('onsureFlyModel');
+    }
+    
+    function cancel() {
+
+        $.ajax({
+            type: "post",
+            url: "${s.base}/cancelTask.action",
+            data: {
+                'id': $('#cancelTaskId').val(),
+            },
+            success: function (result) {
+                if (result.errcode == 1) {
+                    Modal.show('ocDialogModal');
+                    $("#resText").text(result.message);
+                    setTimeout("window.location.reload()", 2000);
+                }
+            }, error: function () {
+                Modal.show('ocDialogModal');
+                $("#resText").text("取消出错，请刷新重试!");
+                //document.getElementById("resText").innerHTML="删除出错，请刷新重试!";
+            }
+        });
+    }
+
+    function urlSubmit() {
+
+        $.ajax({
+            type: "post",
+            url: "${s.base}/deleteTask.action",
+            data: {
+                'id': $('#taskid').val(),
+            },
+            success: function (result) {
+                if (result.errcode == 0 && result.message == "SUCCESS") {
+                    Modal.show('ocDialogModal');
+                    $("#resText").text(result.data);
+                    setTimeout("window.location.reload()", 2000);
+
+                }
+            }, error: function () {
+                Modal.show('ocDialogModal');
+                $("#resText").text("删除出错，请刷新重试!");
+                //document.getElementById("resText").innerHTML="删除出错，请刷新重试!";
+            }
+        });
+    }
+
+    //允许放飞
+    function onsureFlyByTaskId(taskid) {
+        $.ajax({
+            type: "post",
+            url: "${s.base}/onsureFly.action",
+            data: {
+                'id': $('#onsureFlyTaskId').val()
+            },
+            success: function (result) {
+
+                if (result.errcode == 1) {
+                    $("#resText").text(result.message);
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 1000);
+                }
+            }
+        });
+    }
+
+    //驳回放飞
+    function rejectFly(taskid) {
+        $.ajax({
+            type: "post",
+            url: "${s.base}/rejectFly.action",
+            data: {
+                'id': taskid,
+            },
+            success: function (result) {
+
+                if (result.errcode == 1) {
+                    $("#resText").text(result.message);
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 1000);
+                }
+            }
+        });
+    }
+
+    function deleteTask(taskid) {
+
+        $('#taskid').val(taskid);
+        Modal.show('deleltconfirmModel');
+    }
+
+    function taskAlarm(taskid) {
+        window.open("${s.base}/alarmWithId.action?id=" + taskid);
+    }
+
+    function taskImage(taskId) {
+        window.open("${s.base}/imageWithId.action?id=" + taskId)
+    }
+
+    function onsureTaskOver(taskid) {
+        $.ajax({
+            type: "post",
+            url: "${s.base}/onsureTaskOver.action",
+            data: {
+                'id': taskid
+            },
+            success: function (result) {
+                if (result.errcode == 1) {
+                    $("#resText").text(result.message);
+                    Modal.show('ocDialogModal');
+                    setTimeout("document.location.reload();", 1000);
+                }
+            }
+        });
+    }
+
+    $("#timeReverseView").click(function () {
+        $(location).attr('href', '${s.base}/timeReverseView.action');
+    });
+
+</script>
+</body>
+</html>

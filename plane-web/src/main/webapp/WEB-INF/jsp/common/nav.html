@@ -1,0 +1,243 @@
+<!-- 页面导航栏页面 -->
+<!-- BEGIN SIDEBAR -->
+
+<div class="page-sidebar nav-collapse collapse">
+
+    <!-- BEGIN SIDEBAR MENU -->
+
+    <ul class="page-sidebar-menu">
+        <li>
+            <div class="sidebar-toggler hidden-phone"></div>
+        </li>
+
+        <!--<li>-->
+        <!-- BEGIN RESPONSIVE QUICK SEARCH FORM -->
+        <!--
+            <form class="sidebar-search">
+                <div class="input-box">
+                    <a href="javascript:;" class="remove"></a>
+                    <input type="text" placeholder="查找功能..." />
+                    <input type="button" class="submit" value=" " />
+                </div>
+            </form>
+        -->
+        <!-- END RESPONSIVE QUICK SEARCH FORM -->
+        <!--</li>-->
+        <!--  我的任务 -->
+<#if curNav ??>
+    <#if curNav =="createTask" || curNav =="taskAllList" || curNav =="home">
+      <li class="active">
+    <#else>
+      <li class="">
+    </#if>
+        <a href="javascript:;">
+            <i class="icon-home"></i>
+        <#--  <a href="#" ></a>-->
+            <span class="title">我的任务</span>
+
+             <#if curNav =="createTask" || curNav =="taskAllList" || curNav =="home">
+              <span class="selected"></span>
+             <#else>
+              <span class=""></span>
+             </#if>
+            <span class="arrow "></span>
+        </a>
+        <ul class="sub-menu">
+            <li <#if (curNav)?? && curNav =="home">class="active"</#if>><a href="${s.base}/home.action">主页</a></li>
+            <#if !Session[ "super_administrator"]?exists>
+            <li <#if (curNav)?? && curNav =="createTask">class="active"</#if>><a href="${s.base}/toTaskCreate.action">创建任务</a>
+            </li>
+            </#if>
+            <li <#if (curNav)?? && curNav =="taskAllList">class="active"</#if>><a href="${s.base}/taskPageList.action">任务一览</a>
+            </li>
+        </ul>
+    </li>
+</#if>
+
+
+<#--<#if curNav ??>-->
+    <#--<#if  curNav =="routeList" || curNav =="routeImport" ||  curNav =="routeMap">-->
+        <#--<li class="active">-->
+    <#--<#else>-->
+        <#--<li class="">-->
+    <#--</#if>-->
+    <#--<a href="javascript:;">-->
+        <#--<i class="icon-link"></i>-->
+        <#--<span class="title">光缆路由</span>-->
+        <#--<#if  curNav =="routeList" || curNav =="routeImport" ||  curNav =="routeMap">-->
+               <#--<span class="selected"></span>-->
+        <#--<#else>-->
+               <#--<span class=""></span>-->
+        <#--</#if>-->
+        <#--<span class="arrow "></span>-->
+    <#--</a>-->
+        <#--<ul class="sub-menu">-->
+            <#--<#if !Session[ "super_administrator"]?exists>-->
+            <#--<li <#if (curNav)?? && curNav =="routeImport">class="active"</#if>><a href="${s.base}/routeImport.action">光缆导入</a>-->
+            <#--</li>-->
+            <#--</#if>-->
+        <#--&lt;#&ndash;<li><a href="${s.base}/routeMap.action">光缆地图</a></li>&ndash;&gt;-->
+            <#--<li <#if (curNav)?? && curNav =="routeList">class="active"</#if>><a-->
+                    <#--href="${s.base}/routeList.action">光缆一览</a></li>-->
+        <#--</ul>-->
+    <#--</li>-->
+<#--</#if>-->
+
+
+<#if curNav ??>
+    <#if curNav =="flyingPathList" || curNav =="setFlyPath" || curNav =="flyingPathImport">
+        <li class="active">
+    <#else>
+        <li class="">
+    </#if>
+    	<a href="javascript:;">
+            <i class="icon-globe"></i>
+            <span class="title">巡检路经</span>
+            <#if curNav =="flyingPathList" || curNav =="setFlyPath" || curNav =="flyingPathImport">
+                   <span class="selected"></span>
+            <#else>
+                   <span class=""></span>
+            </#if>
+            <span class="arrow "></span>
+        </a>
+            <ul class="sub-menu">
+                <#if !Session[ "super_administrator"]?exists>
+                   <li <#if (curNav)?? && curNav =="flyingPathImport">class="active"</#if>><a
+                           href="${s.base}/flyingPathImport.action">路径导入</a></li>
+                </#if>
+                <li <#if (curNav)?? && curNav =="flyingPathList">class="active"</#if>><a
+                        href="${s.base}/doGetFlyingPathList.action">路经一览</a></li>
+            </ul>
+    </li>
+</#if>
+
+
+<#if curNav??>
+    <#if curNav =="robotAllList" || curNav =="robotRegister" || curNav =="videoRegister">
+         <li class="active">
+    <#else >
+         <li class="">
+    </#if>
+	<a href="javascript:;">
+        <i class=" icon-android"></i>
+        <span class="title">设备管理</span>
+         <#if curNav =="uavAllList">
+                   <span class="selected"></span>
+         <#else>
+                   <span class=""></span>
+         </#if>
+        <span class="arrow "></span>
+    </a>
+    <ul class="sub-menu">
+        <li <#if (curNav)?? && curNav =="robotAllList">class="active"</#if>><a href="${s.base}/robotList.action">机器人查看</a></li>
+        <li <#if (curNav)?? && curNav =="robotRegister">class="active"</#if>><a href="${s.base}/robotRegister.action">机器人注册</a></li>
+        <li <#if (curNav)?? && curNav =="videoRegister">class="active"</#if>><a href="${s.base}/videoRegister.action">摄像头注册</a></li>
+    </ul>
+   </li>
+</#if>
+
+
+<#if curNav??>
+    <#if curNav =="alarmList" || curNav =="alarmhistory" || curNav =="importAlarm">
+        <li class="active">
+    <#else >
+        <li class="">
+    </#if>
+    	<a href="javascript:;">
+            <i class="icon-warning-sign"></i>
+            <span class="title">历史告警</span>
+               <#if curNav =="alarmList" || curNav =="alarmhistory" || curNav =="importAlarm">
+                   <span class="selected"></span>
+               <#else>
+                   <span class=""></span>
+               </#if>
+            <span class="arrow "></span>
+        </a>
+        <ul class="sub-menu">
+            <li <#if (curNav)?? && curNav =="alarmhistory">class="active"</#if>><a href="${s.base}/alarmHistory.action">历史告警</a>
+            </li>
+        </ul>
+       </li>
+</#if>
+
+
+<#if curNav??>
+    <#if curNav =="taskStatistics" || curNav == "flyingPathStatistics" >
+    <li class="active">
+    <#else >
+    <li class="">
+    </#if>
+    <a href="javascript:;">
+        <i class="icon-table"></i>
+        <span class="title">数据汇总</span>
+         <#if curNav =="taskStatistics" || curNav == "flyingPathStatistics" >
+               <span class="selected"></span>
+         <#else>
+               <span class=""></span>
+         </#if>
+        <span class="arrow "></span>
+    </a>
+    <ul class="sub-menu">
+        <li <#if (curNav)?? && curNav =="taskStatistics">class="active"</#if>><a
+                href="${s.base}/dataRoute.action">任务汇总</a></li>
+        <li><a href="#">巡检路经汇总</a></li>
+    </ul>
+    </li>
+</#if>
+
+
+<#if curNav??>
+    <#if curNav =="usersEdit" || curNav =="usersBind">
+    <li class="active">
+    <#else >
+    <li class="">
+    </#if>
+    <a href="javascript:;">
+        <i class="icon-group"></i>
+        <span class="title">用户管理</span>
+        <#if curNav =="usersEdit" || curNav =="usersBind">
+               <span class="selected"></span>
+        <#else>
+               <span class=""></span>
+        </#if>
+        <span class="arrow "></span>
+    </a>
+    <ul class="sub-menu">
+        <li <#if (curNav)?? && curNav =="usersEdit">class="active"</#if>><a
+                href="${s.base}/toUserCreate.action">用户列表</a></li>
+        <!--<li><a href="#">用户组绑定</a></li>-->
+    </ul>
+    </li>
+</#if>
+
+
+<#if curNav??>
+    <#if curNav =="profileEdit" || curNav =="logout" || curNav =="passwordEdit">
+    <li class="active">
+    <#else >
+    <li class="">
+    </#if>
+    <a href="javascript:;">
+        <i class="icon-user"></i>
+        <span class="title">我的账号</span>
+    <#if curNav =="profileEdit" || curNav =="logout" || curNav =="passwordEdit">
+               <span class="selected"></span>
+    <#else>
+               <span class=""></span>
+    </#if>
+        <span class="arrow "></span>
+    </a>
+        <ul class="sub-menu">
+            <li <#if (curNav)?? && curNav =="profileEdit">class="active"</#if>><a href="${s.base}/admin/profileEdit">个人信息</a>
+            </li>
+            <li <#if (curNav)?? && curNav =="passwordEdit">class="active"</#if>><a href="${s.base}/admin/passwordEdit">修改密码</a>
+            </li>
+            <li <#if (curNav)?? && curNav =="logout">class="active"</#if>><a href="${s.base}/admin/logout">退出</a></li>
+
+        </ul>
+ </li>
+</#if>
+    </ul>
+    <!-- END SIDEBAR MENU -->
+</div>
+<!-- END SIDEBAR -->

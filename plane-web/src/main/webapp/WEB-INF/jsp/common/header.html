@@ -1,0 +1,41 @@
+<!-- 这是页面的header公共部分 -->
+<div class="header navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <a class="brand" href="${s.base}/home.html">
+            <#--<img alt="" src="${s.base}/res/i/header.png">--><h3>&nbsp;&nbsp;&nbsp;&nbsp;华中科技大学机器人智能巡检系统</h3>
+        </a>
+        <a href="javascript:;" class="btn-navbar collapsed" data-toggle="collapse" data-target=".nav-collapse">
+            <img src="${s.base}/media/image/menu-toggler.png" alt=""/>
+        </a>
+        <!-- END RESPONSIVE MENU TOGGLER -->
+
+        <!-- BEGIN TOP NAVIGATION MENU -->
+
+        <ul class="nav pull-right" style="">
+            <!-- BEGIN USER LOGIN DROPDOWN -->
+            <li class="dropdown user">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <#--<#if Session["login_user"].icon?exists && Session["login_user"].icon != "">-->
+                    <#--<img src=${Session["login_user"].icon} id="image"-->
+                         <#--style="width:40px;height:40px;margin-right:-->
+                         <#--5px; alt="">-->
+                    <#--<#else>-->
+                    <img src="${s.base}/res/i/defaultIcon.jpg" id="image"
+                         style="width:40px;height:40px;margin-right:
+                         5px; alt="">
+                    <#--</#if>-->
+                    <span class="username"> <#if Session["login_user"]?exists>${Session["login_user"].nickname!}</#if></span>
+                    <i class="icon-angle-down"></i>
+                </a>
+
+                <ul class="dropdown-menu">
+                    <li><a><i
+                            class="icon-user"></i>用户： <#if Session["login_user"]?exists>${Session["login_user"].name}</#if>
+                    </a></li>
+                    <li><a href="${s.base}/admin/profileEdit"><i class="icon-user-md"></i> 个人信息</a></li>
+                    <li><a href="${s.base}/admin/logout"><i class=" icon-signout"></i> 注销</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hust.plane.mapper.mapper.VideoMapper">
+    <resultMap id="BaseResultMap" type="hust.plane.mapper.pojo.Video">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="DeviceId" property="deviceid" jdbcType="VARCHAR"/>
+        <result column="Name" property="name" jdbcType="VARCHAR"/>
+        <result column="Description" property="description" jdbcType="VARCHAR"/>
+        <result column="CreateTime" property="createtime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id,DeviceId,Name,Description,CreateTime
+    </sql>
+
+    <select id="selectALLVideo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from K_Video
+    </select>
+    <select id="getNameById" parameterType="java.lang.Integer"
+            resultType="java.lang.String">
+        select Name
+        from K_Video
+        where id=#{id,,jdbcType=INTEGER}
+    </select>
+    <select id="getVideoById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from K_Video
+        where id=#{id,,jdbcType=INTEGER}
+    </select>
+    <insert id="insertVideo" parameterType="hust.plane.mapper.pojo.Video">
+         insert into K_Video(DeviceId,Name,Description,CreateTime) values (#{deviceid,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP})
+    </insert>
+</mapper>

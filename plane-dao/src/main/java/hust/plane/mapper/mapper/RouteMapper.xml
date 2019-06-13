@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hust.plane.mapper.mapper.RouteMapper">
+    <resultMap id="BaseResultMap" type="hust.plane.mapper.pojo.Route">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="Name" property="name" jdbcType="VARCHAR"/>
+        <result column="Type" property="type" jdbcType="INTEGER"/>
+        <result column="Description" property="description" jdbcType="VARCHAR"/>
+        <result column="CreateTime" property="createtime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="ResultMapWithPathData" type="hust.plane.mapper.pojo.Route" extends="BaseResultMap">
+        <result column="RoutePathData" property="routepathdata" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="hust.plane.mapper.pojo.Route" extends="BaseResultMap">
+        <result column="FlagData" property="flagdata" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithPathAndBLOB" type="hust.plane.mapper.pojo.Route" extends="ResultMapWithPathData">
+        <result column="FlagData" property="flagdata" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_list">id,Name,Type,Description,CreateTime</sql>
+    <select id="selectALLRoute" resultMap="BaseResultMap">
+        select id,Name,AsText(RoutePathData) as RoutePathData,Description,CreateTime,type
+        from K_Route
+    </select>
+
+    <insert id="insert" parameterType="hust.plane.mapper.pojo.Route">
+        insert into K_Route(Name,Type,RoutePathData,Description,CreateTime,FlagData) values (#{name,jdbcType=VARCHAR},
+        #{type,jdbcType=INTEGER}, GeomFromText(#{routepathdata,jdbcType=VARCHAR}),
+        #{description,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP},#{flagdata,jdbcType=LONGVARCHAR})
+    </insert>
+
+    <select id="getRouteByIdAndStatus" parameterType="java.lang.String" resultType="hust.plane.mapper.pojo.Route">
+        select id,Name,AsText(RoutePathData) as RoutePathData,Description,CreateTime,Type
+        from K_Route
+        where 1=1
+        <if test="param1 != null">
+            AND id = #{param1}
+        </if>
+        <if test="param2 != null">
+            AND Type = #{param2}
+        </if>
+    </select>
+
+    <select id="selectRoute" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select id,Name,AsText(RoutePathData) as RoutePathData,Description,CreateTime,Type
+        from K_Route
+        where 1=1
+        AND Name LIKE '%#{param1}%'
+        <if test="type != null">
+            AND Type = #{param2}
+        </if>
+    </select>
+
+    <select id="getRouteByType" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select id,Name,AsText(RoutePathData) as RoutePathData,Description,CreateTime,Type
+        from K_Route
+        where 1=1
+        AND Type = #{param1}
+    </select>
+    <select id="countByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1) from K_Route
+        where Name = #{name,jdbcType=VARCHAR}
+    </select>
+    <select id="getIdByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select id from K_Route
+        where Name = #{name,jdbcType=VARCHAR}
+    </select>
+    <select id="routeCount" parameterType="hust.plane.mapper.pojo.Route"
+            resultType="java.lang.Integer">
+        select count(*) from K_Route
+        where 1=1
+        <if test="name != null">
+            AND Name LIKE CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="type != null">
+            and Type = #{type,jdbcType=INTEGER}
+        </if>
+    </select>
+    <select id="queryRoutePage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_list"/>
+        from K_Route
+        WHERE 1=1
+        <if test="param1.name != null">
+            AND Name LIKE CONCAT('%',#{param1.name,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="param1.type != null">
+            AND Type = #{param1.type,jdbcType=INTEGER}
+        </if>
+        ORDER BY CreateTime DESC
+        LIMIT #{param2.startIndex, jdbcType=INTEGER} , #{param2.pageSize,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteRouteById" parameterType="java.lang.Integer">
+        delete
+        from K_Route
+        where id=#{id,jdbcType=INTEGER}
+    </delete>
+    <select id="getRouteById" parameterType="java.lang.Integer" resultMap="ResultMapWithPathData">
+        select id,Name,AsText(RoutePathData) as RoutePathData,Description,CreateTime,type
+        from K_Route
+        where id=#{id,jdbcType=INTEGER}
+    </select>
+    <select id="getRouteByName" parameterType="java.lang.Integer" resultMap="ResultMapWithPathData">
+        select id,Name,AsText(RoutePathData) as RoutePathData,Description,CreateTime,type
+        from K_Route
+        where Name=#{name,jdbcType=INTEGER}
+    </select>
+    <select id="getRouteWithFlagDataById" parameterType="java.lang.Integer" resultMap="ResultMapWithPathAndBLOB">
+        select id,Name,AsText(RoutePathData) as RoutePathData,FlagData
+        from K_Route
+        where id=#{id,jdbcType=INTEGER}
+    </select>
+    <select id="fuzzySearchByName" parameterType="java.lang.String" resultType="java.lang.String">
+        select Name
+        from K_Route
+        where Name LIKE CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+    </select>
+
+
+</mapper>
