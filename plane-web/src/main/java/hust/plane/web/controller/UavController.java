@@ -112,35 +112,4 @@ public class UavController {
         return "uavListMap";
     }
 
-
-    //多条件查询无人机：根据负责人id查询 或者 登记起始时间到登记终止时间段内查询
-    @RequestMapping("doFindPlane")
-    public String doFindPlane(Model model, @RequestParam("userid") int owner, @RequestParam("starttime") Date starttime, @RequestParam("endtime") Date endtime) {
-
-        List<Uav> allPlane = uavServiceimpl.getPlaneByOption(owner, starttime, endtime);
-        List<UavVO> planeList = new ArrayList<UavVO>();
-        for (int i = 0; i < allPlane.size(); i++) {
-            UavVO planevo = new UavVO(allPlane.get(i));
-            planeList.add(planevo);
-        }
-        model.addAttribute("planelist", JsonUtils.objectToJson(planeList));
-        model.addAttribute("curNav", "planFind");
-        return "planeList";
-
-    }
-    //直接使用无人机发送的航角数据
-/*	@RequestMapping(value = "/getPlaneAngle", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	@ResponseBody
-	public String getPlaneAngle(@RequestParam("preLongitude") String preLongitude, @RequestParam("preLatitude") String preLatitude,
-								@RequestParam("currentLongitude") String currentLongitude, @RequestParam("currentLatitude") String currentLatitude) {
-		AngleUtil.MyLatLng prePosition=new AngleUtil.MyLatLng(Double.valueOf(preLongitude),Double.valueOf(preLatitude));
-		AngleUtil.MyLatLng currentPosition=new AngleUtil.MyLatLng(Double.valueOf(currentLongitude),Double.valueOf(currentLatitude));
-		Double angle = Double.valueOf(Math.floor(AngleUtil.getAngle(prePosition,currentPosition)));
-		if(angle==null){
-			logger.error("===========获取飞机当前角度失败=============");
-			return JsonView.render(1,"获取飞机角度失败");
-		}
-		return JsonView.render(0, WebConst.SUCCESS_RESULT,angle);
-	}*/
-
 }

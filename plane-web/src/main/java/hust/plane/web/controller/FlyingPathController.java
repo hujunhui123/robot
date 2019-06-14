@@ -98,20 +98,6 @@ public class FlyingPathController {
 //        return new JsonView(0).toString();
 //    }
 
-    //返回设定飞行路径页面，返回所有路由数据，并在前台显示
-    @RequestMapping("/setFlyingPath")
-    public String doSetFlyPath(Model model) {
-        List<Route> allRoute = routeServiceImpl.getAllRoute();
-        List<RouteVO> routeList = new ArrayList<RouteVO>();
-        for (int i = 0; i < allRoute.size(); i++) {
-
-            RouteVO routeVo = new RouteVO(allRoute.get(i));
-            routeList.add(routeVo);
-        }
-        model.addAttribute("routeList", JsonUtils.objectToJson(routeList));
-        model.addAttribute("curNav", "setFlyPath");
-        return "setFlyingPath";
-    }
 
     //获取前台传输的路径字符串
     @RequestMapping("/doSetFlyPath")

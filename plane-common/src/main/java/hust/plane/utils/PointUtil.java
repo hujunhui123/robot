@@ -44,22 +44,4 @@ public class PointUtil {
 
     }
 
-
-    public static void main(String[] args) {
-//		String s = "Point(1.9999 1.88888)";
-//		Point stringToPoint = PointUtil.StringToPoint(s);
-//		System.out.println(stringToPoint.getLatitude());
-//		List<Double> list = new ArrayList<>();
-//		list.add(123.43);
-//		list.add(1.43);
-//		System.out.println(pointToSqlString(list));
-
-        Integer intHao = 6;
-        String strHao = intHao.toString();
-        while (strHao.length() < 4) {
-            strHao = "0" + strHao;
-        }
-        System.out.println(strHao);
-
-    }
 }

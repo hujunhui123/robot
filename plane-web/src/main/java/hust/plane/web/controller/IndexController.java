@@ -119,8 +119,7 @@ public class IndexController {
     @RequestMapping(value = "getInfoPointByName", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody
     public String getInfoPointByNameSearch(@RequestParam(value = "name") String name) {
-    	
-        //List<InfoPoint> infoPoints = new ArrayList<>();
+
         List<InfoPoint> infoPoints = infoPointServiceImpl.selectInfoPointByName(name);
         List<InfoPointVO> infoPointVOs = new ArrayList<>();
         Iterator<InfoPoint> iterator = infoPoints.iterator();

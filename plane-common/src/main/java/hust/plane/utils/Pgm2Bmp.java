@@ -14,8 +14,15 @@ import java.util.Scanner;
  */
 public class Pgm2Bmp {
 
-    public void pgmConvert(){
-        String filePath = "F:\\\\map.pgm";
+    //默认文件都是P5格式的PGM文件
+    //开头如下:
+    //   P5
+    //   # xxx xxx
+    //   int1 int2
+    //   255
+
+    public static void pgmConvert() {
+        String filePath = "F:\\map.pgm";
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(filePath);
@@ -29,12 +36,11 @@ public class Pgm2Bmp {
         // 跳过 描述行
         scan.nextLine();
 
-        // Read pic width, height and max value
         int picWidth = scan.nextInt();
         int picHeight = scan.nextInt();
         int maxvalue = scan.nextInt();
 
-        try {
+        try {   //关闭文件流
             fileInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -46,7 +52,7 @@ public class Pgm2Bmp {
             dis = new DataInputStream(fileInputStream);
             int numnewlines = 4;
 
-            while (numnewlines > 0) {
+            while (numnewlines > 0) { //跳过前面四行文件头
                 char c;
                 do {
                     c = (char) (dis.readUnsignedByte());
@@ -54,18 +60,15 @@ public class Pgm2Bmp {
                 numnewlines--;
             }
 
-            // read the image data
+            // 开始读取数据
             int[][] data2D = new int[picHeight][picWidth];
             for (int row = 0; row < picHeight; row++) {
                 for (int col = 0; col < picWidth; col++) {
                     data2D[row][col] = dis.readUnsignedByte();
+                    System.out.print(data2D[row][col]+",");
                 }
+                System.out.println("");
             }
-
-            Color[][] pointArray;
-
-
-
 
 
         } catch (IOException e) {
@@ -73,5 +76,11 @@ public class Pgm2Bmp {
         }
 
     }
+
+    public static void main(String[] args){
+
+        pgmConvert();
+    }
+
 
 }

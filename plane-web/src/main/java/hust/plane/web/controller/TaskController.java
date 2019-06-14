@@ -721,49 +721,6 @@ public class TaskController {
         return "alarmListWithTaskId";
     }
 
-
-    //查看上传的照片
-    @RequestMapping(value = "imageWithId")
-    public String getTaskImageWithId(@RequestParam(value = "id") int id, Model model) {
-        if (Integer.valueOf(id) != null) {
-
-            String fileROOT = BASE_IMAGE_URL + imgPath;
-            String folder = IMAGE_SOURCE;
-
-            Task task = new Task();
-            task.setId(id);
-            Task task1 = taskServiceImpl.getTaskByTask(task);
-            List<String> picNameList = new ArrayList<>(
-
-            );
-            //跨域请求文件服务器上的图片文件名列表
-            String url = DETECT_SERVER + "taskImages.action";
-            Map<String,String> params = new HashMap<String, String>();
-            params.put("missionId",""+ task1.getMissionId());
-            String alarmlistString = HttpClientUtil.doPost(url,params);
-
-            if(alarmlistString.equals("null")){
-              model.addAttribute("picNameList",JsonView.render(0, "该任务上传的图片为空！"));
-            }
-            else{
-              String[] pictures = alarmlistString.split(",");    //分割得到的字符串
-              picNameList= Arrays.asList(pictures);                      //加入到list对象中
-              model.addAttribute("picNameList",JsonView.render(1, "",JsonUtils.objectToJson(picNameList)));
-            }
-
-            model.addAttribute("baseImageUrl", fileROOT);
-            model.addAttribute("folder", folder);
-
-            if (picNameList.size() > 0)
-                model.addAttribute("picNameList", JsonView.render(1, "", JsonUtils.objectToJson(picNameList)));
-            else
-                model.addAttribute("picNameList", JsonView.render(0, "该任务上传的图片为空！"));
-
-            model.addAttribute("missionId", task1.getMissionId());
-        }
-        return "taskPicture";
-    }
-
     //识别图片
     @RequestMapping(value = "recongize", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody

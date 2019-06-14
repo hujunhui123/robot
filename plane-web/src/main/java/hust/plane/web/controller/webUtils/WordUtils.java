@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class WordUtils {
 
-
+    //该类生成word文档
     public static void exportMillCertificateWord(HttpServletRequest request, HttpServletResponse response, Map map, String filename) throws IOException {
 
         Configuration configuration = null;

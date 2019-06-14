@@ -127,14 +127,6 @@ public class ImgUtils {
         return alarmList;
     }
 
-//    public static void main(String[] args) {
-//
-//        float te = 5.920667E-30f;
-//       byte[] test = float2byte(te);
-//       System.out.println("%" + Arrays.toString(test) + "%");
-//        processlcoaldir(1,"");
-//
-//    }
 
     public static byte[] float2byte(float f) {
 

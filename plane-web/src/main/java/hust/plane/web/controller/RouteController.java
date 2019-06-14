@@ -89,19 +89,6 @@ public class RouteController {
         return "route";
     }
 
-    //在地图上显示全部路由线路
-    @RequestMapping("/routeMap")
-    public String mapAllRoute(Model model) {
-        List<Route> allRoute = routeServiceImpl.getAllRoute();
-        List<RouteVO> routeList = new ArrayList<RouteVO>();
-        for (int i = 0; i < allRoute.size(); i++) {
-            RouteVO routeVo = new RouteVO(allRoute.get(i));
-            routeList.add(routeVo);
-        }
-        model.addAttribute("routeList", JsonUtils.objectToJson(routeList));
-        model.addAttribute("curNav", "routeMap");
-        return "routeMap";
-    }
 
     //查询所有的路由 列表  分页查询
     @RequestMapping("/routeList")
@@ -161,21 +148,6 @@ public class RouteController {
             return new JsonView(0, "SUCCESS", "删除路由失败！").toString();
         }
         return new JsonView(0, "SUCCESS", "未传入路由编号,删除路由失败！").toString();
-    }
-
-    //查看某条路由详情
-    @RequestMapping("showRouteDetail")
-    public String showRouteDetail(Model model, Route route) {
-        Route route1;
-        RouteVO routeVO;
-        if (route.getName() == null || route.getName() == "") {
-            return "common/404";
-        } else {
-            route1 = routeServiceImpl.getRouteByName(route.getName());
-            routeVO = new RouteVO(route1);
-        }
-        model.addAttribute("routedata", JsonUtils.objectToJson(routeVO));
-        return "showRoute";
     }
 
     /**
