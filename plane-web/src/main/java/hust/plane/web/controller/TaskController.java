@@ -49,11 +49,6 @@ public class TaskController {
     @Value(value = "${uploadLocalHost}")
     private String FILE_UPLOAD_HOST;
 
-    @Value(value = "${DETECT_SERVER}")
-    private String DETECT_SERVER;
-
-    @Value(value="${SERVER_TYPE}")
-    private String SERVER_TYPE;
     
     @Autowired
     private TaskService taskServiceImpl;
@@ -88,8 +83,6 @@ public class TaskController {
             task.setUsercreator(userCreator.getId());  //任务管理员
         }
         List<FlyingPathVO> flyingPathVOList = new ArrayList<FlyingPathVO>();   //初始化向前台传送的数据
-        List<AlarmDetailVO> alarmDetailVOList = new ArrayList<AlarmDetailVO>();
-
         List<Task> taskList = taskServiceImpl.getAllTaskByRole(task);
 
         Iterator<Task> iterator = taskList.iterator();    //遍历所有数据
@@ -107,37 +100,12 @@ public class TaskController {
             FlyingPathVO flyingPathVO = new FlyingPathVO(flyingPath);
             flyingPathVOList.add(flyingPathVO);           //添加数据
 
-            for (int i = 0; i < alarmWithIdList.size(); i++) {
-
-                AlarmDetailVO alarmDetailVO = new AlarmDetailVO(alarmWithIdList.get(i));
-                alarmDetailVO.setUav(uav1);
-                //设置来自图片服务器的数据
-                //                     2113.123.12.12/   ImageTask/       YYMMDDXXXX/        ImageAlarm/      1.jpg
-                alarmDetailVO.setImage(BASE_IMAGE_URL + imgPath + task1.getMissionId() + "/" + IMAGE_ALARM + alarmDetailVO.getImage());
-                alarmDetailVO.setTaskName(task1.getName());
-                alarmDetailVO.setFlyingPathName(flyingPath.getName());
-                alarmDetailVO.setUserCreatorName(userCreatorName);
-                alarmDetailVO.setUserAName(userAName);
-                alarmDetailVO.setUserZName(userZName);
-
-                alarmDetailVOList.add(alarmDetailVO);           //添加数据
-            }
         }
-
         model.addAttribute("flyingPath", JsonUtils.objectToJson(flyingPathVOList));
-        model.addAttribute("alarmList", JsonUtils.objectToJson(alarmDetailVOList));
         model.addAttribute("curNav", "home");
         return "home";
     }
 
-    // 得到所有的任务
-    @RequestMapping("/taskList")
-    public String getALLTask(Model model) {
-        List<TaskPojo> allTask = taskServiceImpl.getALLTask();
-        model.addAttribute("taskList", allTask);
-        model.addAttribute("curNav", "taskAllList");
-        return "taskList";
-    }
 
     // 跳转任务创建
     @RequestMapping("/toTaskCreate")
@@ -388,18 +356,6 @@ public class TaskController {
         return "taskList";
     }
 
-    // 确认放飞
-    @RequestMapping(value = "onsureFly", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public String onsureFly(Task task) {
-
-        if (taskServiceImpl.setStatusTaskByTask(task, 8) == true) {
-            return JsonView.render(1, "已确认，可以放飞");
-        } else {
-            return JsonView.render(1, "确认失败,请重试！");
-        }
-
-    }
 
     //取消任务
     @RequestMapping(value = "cancelTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -464,8 +420,8 @@ public class TaskController {
         }
     }
 
-    // 任务分派
-    @RequestMapping(value = "assignTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    // 下发路径    这个方法还没修改
+    @RequestMapping(value = "pushPathByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String assignTask(Task task) throws InterruptedException {
 
@@ -486,6 +442,10 @@ public class TaskController {
 //        params.put("missionId", "" + task2.getMissionId());
 //        String alarmlistString = HttpClientUtil.doPost(url, params);
 //        System.out.println(alarmlistString);
+
+        //在这里下发飞行路径有关信息！！！！@hp
+
+
          String alarmlistString = "success";
 
         if (alarmlistString.equals("success")) {
@@ -508,7 +468,6 @@ public class TaskController {
 
     }
 
-    // 确认任务完成，这个暂时不用
     @RequestMapping(value = "onsureTaskOver", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String onsureTaskOver(Task task, HttpServletRequest request) {
@@ -592,65 +551,6 @@ public class TaskController {
         return "plane";
     }
 
-    // 打印任务报告
-    @RequestMapping("taskReport")
-    public void taskReport(Task task, HttpServletRequest request, HttpServletResponse response) {
-
-        Task task2 = taskServiceImpl.getTaskByTask(task);
-
-        User userCreator = userServiceImpl.getUserById(task2.getUsercreator());
-        User userA = userServiceImpl.getUserById(task2.getUserA());
-        User userZ = userServiceImpl.getUserById(task2.getUserZ());
-
-        Uav uav = new Uav(); // 任务执行的无人机
-        uav.setId(task2.getUavId());
-        uav = uavServiceImpl.getPlaneByPlane(uav);
-
-        List<Alarm> alarms = alarmserviceImpl.getAlarmsByTaskId(task2.getId());
-        List<AlarmVO> alarmVos = new ArrayList<AlarmVO>();
-
-//        String webappRoot = WordUtils.getRootPath();
-        if (alarms.size() > 0) {
-            for (int i = 0; i < alarms.size(); ++i) {
-                AlarmVO alarmVo = new AlarmVO(alarms.get(i));
-
-                //读取本机图片服务器数据
-                //alarmVo.setImage(BASE_IMAGE_URL+ imgPath + task2.getId() + "/" +  IMAGE_ALARM + alarmVo.getImage());
-                alarmVo.setImage(FILE_UPLOAD_HOST + imgPath + task2.getMissionId() + "/" + IMAGE_ALARM + alarmVo.getThumbnail());
-                alarmVo.setBase();
-                // alarmVo.setImgBaseCode();
-                alarmVos.add(alarmVo);
-            }
-        }
-
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        dataMap.put("alarms", alarmVos);
-        dataMap.put("uav", uav);
-        dataMap.put("task", task2);
-        dataMap.put("userA", userCreator);
-        dataMap.put("userB", userA);
-        dataMap.put("userC", userZ);
-
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
-        String filename = task2.getName() + "-" + sdf.format(date) + ".doc";
-
-        try {
-            WordUtils.exportMillCertificateWord(request, response, dataMap, filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        List<Integer> groupIdList = userGroupService.selectGroupIdWithUserId(userCreator.getId());
-        if (groupIdList.contains(Integer.valueOf(1))) {
-            //是浏览者,不改变状态
-        } else {
-            //是观察者，改变状态
-            if (task2.getStatus() == 12) {
-                taskServiceImpl.setStatusTaskByTask(task, 13); // 设置打印报告完成
-            }
-        }
-    }
 
     /**
      * 人员动态搜索提示
@@ -721,27 +621,5 @@ public class TaskController {
         return "alarmListWithTaskId";
     }
 
-    //识别图片
-    @RequestMapping(value = "recongize", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    @ResponseBody
-    public String recongizePicture(Task task) {
-
-        //httpclient跨域请求进行识别
-        String url = DETECT_SERVER + "createAlarm.action";
-        Task task1 = taskServiceImpl.getTaskByTask(task);
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("taskId", "" + task1.getId());
-        params.put("missionId", "" + task1.getMissionId());
-            
-        String alarmlistString = HttpClientUtil.doPost(url, params);    //httpclient远程访问
-
-        if (alarmlistString.equals("success")) {                 
-            taskServiceImpl.setStatusTaskByTask(task, 12);    //为了保证同步，可以考虑把改变工单的状态放在在detect里面
-            return JsonView.render(0, "识别完成!");
-        } else {
-            return JsonView.render(0, "识别未完成！");
-        }
-
-    }
 
 }

@@ -50,7 +50,7 @@ var WebSocketUtil = {
         //alert("收到消息"+event.data);
     },
     onError: function (event) {
-        alert("未连接到服务器！");
+        //alert("未连接到服务器！");
     },
     sendMessage: function (content) {
         WebSocketUtil.webSocket.send(content);
