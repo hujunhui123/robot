@@ -36,75 +36,6 @@
             text-align: right;
             width: 100px;
         }
-       /* .suggest {
-            border-top: 0;
-            width: 384px;
-            background-color: #fff;
-            display: none;
-        }
-
-        .suggest ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .suggest ul li {
-            padding: 3px;
-            font-size: 14px;
-            height: 20px;
-            line-height: 20px;
-            cursor: pointer;
-        }
-
-        .suggest ul li:hover {
-            background-color: #E0E0E0;
-        }
-
-        .search-div {
-            position: absolute;
-            z-index: 100;
-            background-color: #FCFCFC;
-            width:530px;
-            margin-left:318px;
-            display: none;
-            border: 1px solid #a6a6a6;
-            border-top: none;
-            max-height: 200px;
-            overflow-y: scroll;
-        }
-
-        .search-div::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .search-div::-webkit-scrollbar-thumb {
-            -webkit-box-shadow: inset 0 0 6px rgba(169, 169, 169);
-        }
-
-        .search-div ul, li {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .search-div li {
-            line-height: 18px;
-            font-size: 14px;
-            padding: 5px 10px;
-        }
-
-        .search-div li.current {
-            background: #CCCCCC;
-            color: #0000FF;
-            cursor: pointer;
-        }
-
-        .search-div li:hover {
-            background: #CCCCCC;
-            color: #0000FF;
-            cursor: pointer;
-        }*/
         .span8{
            width:850px !important;
         }
@@ -118,11 +49,7 @@
     <div class="page-content">
         <!-- BEGIN PAGE CONTAINER-->
         <div class="container-fluid">
-            <!--  下面这块内容是在页面写死的  -->
-            <!-- <h4 class="page-title">我的任务<small>创建我的任务</small></h4>-->
-
             <h4 class="page-title"></h4>
-
             <ul class="breadcrumb">
                 <li>
                     <i class="icon-home"></i>
@@ -298,8 +225,7 @@
             if ($("#uavId option[value='" + val + "']").length > 1)
                 $("#uavId option[value='" + val + "']:gt(0)").remove();
         });
-        
-       
+
     }
 
 
@@ -314,13 +240,6 @@
         if (taskname == null || taskname == "") {
             Modal.show('ocDialogModal');
             document.getElementById("resText").innerHTML = "任务名不能为空!";
-            return;
-        }
-        var userA = $("#userA").val();
-        var userZ = $("#userZ").val();
-        if (userA == "" || userA == null || userZ == "" || userZ == null || userZ == userA) {
-            Modal.show('ocDialogModal');
-            document.getElementById("resText").innerHTML = "放飞员和接机员均不能为空,且不能为同一人!";
             return;
         }
 
@@ -353,8 +272,6 @@
             dataType: 'json',
             data: {
                 "name": taskname,
-                "userAName": userA,
-                "userZName": userZ,
                 "uavId": uavId,
                 "flyingpathId": flyingpathid,
                 "planstarttime": planstarttime,
@@ -385,14 +302,8 @@
             document.getElementById("resText").innerHTML = "任务名不能为空!";
             return;
         }
-        var userA = $("#userA").val();
-        var userZ = $("#userZ").val();
+
         var uavId = $("#uavId").val();
-        if (userA == "" || userA == null || userZ == "" || userZ == null || userZ == userA) {
-            Modal.show('ocDialogModal');
-            document.getElementById("resText").innerHTML = "放飞员和接机员均不能为空,且不能为同一人!";
-            return;
-        }
         var flyingpathid = $("#flyingpathid").val();
 
         var planstarttime = $("#planstarttime").val().toString();
@@ -422,8 +333,6 @@
             dataType: 'json',
             data: {
                 "name": taskname,
-                "userAName": userA,
-                "userZName": userZ,
                 "uavId": uavId,
                 "flyingpathId": flyingpathid,
                 "planstarttime": planstarttime,
@@ -444,124 +353,5 @@
         });
     }
 
-
-    //放飞者
-    $(function () {
-        $("#userA").bind('input onchange', function () {
-            //$.ajax()远程获取json数据
-            var flyerDepartmentId = $("#flyerDepartmentId option:selected").val();
-            $.ajax({
-                type: "POST",
-                url: "${s.base}/searchFlyer.action",
-                dataType: 'json',
-                data: {
-                    queryString: $("#userA").val(),
-                    departmentId: flyerDepartmentId
-                },
-                success: function (result) {
-                    //处理返回的数据
-                    // var text = json_encode(response);
-                    if (result.errcode == 0 && result.message == "SUCCESS") {
-                        var userStr = JSON.stringify(result.data);
-                        var arr = userStr.substring(1, userStr.length - 1).split(',');
-                        for (var j = 0; j < arr.length; j++) {
-                            arr[j] = arr[j].substring(1, arr[j].length - 1);
-                        }
-                        var html = "";
-                        for (var i = 0; i < arr.length; i++) {
-                            html += "<li class='taskoff'>" + arr[i] + "</li>"
-                        }
-
-                        $('#search-result').html(html);
-                        $('#search-div1').css('display', 'block');
-
-                    }
-                },
-                error: function () {
-                    //Modal.tipFailure('导入失败');
-                }
-            });
-        });
-
-        /*  var flyer = document.getElementById('Flyer');
-            flyer.onblur = function () {
-                var noContent = $("#Flyer").html();
-                if (noContent == null || noContent.length == 0) {
-                    $("#search-div1").css('display', 'none');
-                }
-            }
-
-            var recipient = document.getElementById('Recipient');
-            recipient.onblur = function () {
-                var noContent = $("#Recipient").html();
-                if (noContent == null || noContent.length == 0) {
-                    $("#search-div2").css('display', 'none');
-                }
-            } */
-
-        //接收者
-        $("#userZ").bind('input onchange', function () {
-            //$.ajax()远程获取json数据
-            var receptorDepartmentId = $("#receptorDepartmentId option:selected").val();
-            $.ajax({
-                type: "POST",
-                url: "${s.base}/searchFlyer",
-                dataType: 'json',
-                data: {
-                    queryString: $("#userZ").val(),
-                    departmentId: receptorDepartmentId
-                },
-                success: function (result) {
-                    //处理返回的数据
-                    // var text = json_encode(response);
-                    if (result.errcode == 0 && result.message == "SUCCESS") {
-                        var userStr = JSON.stringify(result.data);
-                        var arr = userStr.substring(1, userStr.length - 1).split(',');
-                        for (var j = 0; j < arr.length; j++) {
-                            arr[j] = arr[j].substring(1, arr[j].length - 1);
-                        }
-                        var html = "";
-                        for (var i = 0; i < arr.length; i++) {
-                            html += "<li>" + arr[i] + "</li>"
-                        }
-                        $('#search-result2').html(html);
-                        $('#search-div2').css('display', 'block');
-                    }
-                },
-                error: function () {
-                    //Modal.tipFailure('查询失败');
-                }
-            });
-        });
-
-    });
-
-    $('#search-result').on('click', 'li', function () {
-        $("#userA").val($(this).text());
-        $('#search-div1').css('display', 'none');
-        //$('#search-div1').empty()
-    });
-
-    $('#search-result2').on('click', 'li', function () {
-        //$(this).text();
-        $("#userZ").val($(this).text());
-        $('#search-div2').css('display', 'none');
-    });
-
-    $("#userA").bind("input propertychange", function (event) {
-        var inputVal = $("#userA").val();
-        var str = inputVal.replace(/(^\s*)|(\s*$)/g, '');//去除空格;
-        if (str == '' || str == undefined || str == null) {
-            $('#search-div1').css('display', 'none');
-        }
-    });
-
-    $("#userZ").bind("input propertychange", function (event) {
-        var inputVal = $("#userZ").val();
-        var str = inputVal.replace(/(^\s*)|(\s*$)/g, '');//去除空格;
-        if (str == '' || str == undefined || str == null) {
-            $('#search-div2').css('display', 'none');
-        }
-    });
 </script>
 </html>

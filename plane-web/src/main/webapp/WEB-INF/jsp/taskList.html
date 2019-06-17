@@ -161,7 +161,7 @@
                                                        <button type="button" class="btn green"
                                                                onclick="observeRobot('${s.base}/getTaskPlaneLocation?uavid=${taskpojo.task.uavId!}&taskid=${taskpojo.task.id!}')">
                                                            <i class="icon-signin icon-white"></i>
-                                                           <span>查看机器人</span>
+                                                           <span>实时查看</span>
                                                        </button>
                                                        <button type="button" class="btn green"
                                                                onclick="onsureTaskOver(${taskpojo.task.id!})">
@@ -204,7 +204,22 @@
         </div>
     </div>
 </div>
-
+<!-- 提示信息框-->
+<div class="modal" id="ocDialogModal" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper small">
+        <div class="modal-dialog w-4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-title f-16">提示信息</div>
+                </div>
+                <div class="modal-body">
+                    <div><span class="color-oc f-16" style="font-size:1.2rem;" id="resText">操作成功!</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 路径下发确认 -->
 <div class="modal fade" id="pushPathModel" tabindex="-1" aria-hidden="true">
@@ -258,10 +273,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-                <h4 class="modal-title">归档确认</h4>
+                <h4 class="modal-title">任务完成确认</h4>
             </div>
             <div class="modal-body" style="font-size:1.2rem;">
-                <p id="tip">您确认要归档该任务吗？</p>
+                <p id="tip">您确认结束该任务吗？</p>
             </div>
             <div class="modal-footer">
                 <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
@@ -322,7 +337,7 @@
             success: function (result) {
 
                 if (result.errcode == 1) {
-                    document.getElementById("resText").innerHTML = result.message
+                    document.getElementById("resText").innerHTML = result.message;
                     Modal.show('ocDialogModal');
                     setTimeout("document.location.reload();", 2000);
                 }
@@ -350,7 +365,7 @@
             success: function (result) {
 
                 if (result.errcode == 1) {
-                    document.getElementById("resText").innerHTML = result.message
+                    document.getElementById("resText").innerHTML = result.message;
                     Modal.show('ocDialogModal');
                     setTimeout("document.location.reload();", 2000);
                 }
@@ -370,7 +385,7 @@
     }
 
     //完成任务
-    function finishTask(taskid) {
+    function finishTaskById() {
         $.ajax({
             type: "post",
             url: "${s.base}/onsureTaskOver.action",
@@ -379,9 +394,9 @@
             },
             success: function (result) {
                 if (result.errcode == 1) {
-                    $("#resText").text(result.message);
+                    document.getElementById("resText").innerHTML = result.message;
                     Modal.show('ocDialogModal');
-                    setTimeout("document.location.reload();", 1000);
+                    setTimeout("document.location.reload();", 2000);
                 }
             }
         });
@@ -405,7 +420,7 @@
             success: function (result) {
                 if (result.errcode == 0 && result.message == "SUCCESS") {
                     Modal.show('ocDialogModal');
-                    $("#resText").text(result.data);
+                    document.getElementById("resText").innerHTML = result.message;
                     setTimeout("window.location.reload()", 2000);
 
                 }

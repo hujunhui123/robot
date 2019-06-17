@@ -92,8 +92,6 @@ public class TaskServiceImpl implements TaskService {
                 TaskPojo taskPojo = new TaskPojo();
                 // 查询姓名
                 User user1 = userMapper.selectByPrimaryKey(task1.getUsercreator());
-                User user2 = userMapper.selectByPrimaryKey(task1.getUserA());
-                User user3 = userMapper.selectByPrimaryKey(task1.getUserZ());
 
                 if (task1.getUavId() == null || task1.getUavId() == 0) {
                     taskPojo.setUavName("");
@@ -106,9 +104,6 @@ public class TaskServiceImpl implements TaskService {
 
                 taskPojo.setTask(task1);
                 taskPojo.setUserCreatorName(user1.getName());
-                taskPojo.setUserAName(user2.getName());
-                taskPojo.setUserZName(user3.getName());
-
 
                 taskPojo.setFlyingPathName(flyingPathMapper.getNameById(task1.getFlyingpathId()));
                 items.add(taskPojo);
@@ -157,13 +152,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public String getStatusByTask(Task task) {
-
         return taskMapper.getStatusByTask(task);
     }
 
     @Override
     public boolean setFinishStatusTaskByTask(Task task, int finishstatus) {
-        // TODO Auto-generated method stub
+        
         Task task2 = taskMapper.selectByPrimaryKey(task.getId());
         task2.setFinishstatus(finishstatus);
 

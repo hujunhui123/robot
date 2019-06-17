@@ -176,26 +176,7 @@ public class TaskController {
 
         User createUser = PlaneUtils.getLoginUser(request);
         Task task = new Task();
-        User userA = null;
-        User userZ = null;
 
-        if (taskVO.getUserAName() != null && taskVO.getUserAName() != "") {
-            userA = userServiceImpl.getUserByName(taskVO.getUserAName());
-            if (userA == null) {
-                return JsonView.render(1, "任务提交失败，起飞员不存在！");
-            } else {
-                task.setUserA(userA.getId());
-            }
-        }
-        if (taskVO.getUserZName() != null && taskVO.getUserZName() != "") {
-
-            userZ = userServiceImpl.getUserByName(taskVO.getUserZName());
-            if (userZ == null) {
-                return JsonView.render(1, "任务提交失败，降落员不存在！");
-            } else {
-                task.setUserZ(userZ.getId());
-            }
-        }
         if (taskVO.getUavId() != null && taskVO.getUavId() != 0) {
             task.setUavId(taskVO.getUavId());
         }
@@ -211,7 +192,6 @@ public class TaskController {
         if (taskVO.getCreatetime() != null) {
             task.setCreatetime(taskVO.getCreatetime());
         }
-
 
         task.setName(taskVO.getName());
         //task.setCreatetime(new Date());
@@ -246,26 +226,7 @@ public class TaskController {
 
         User createUser = PlaneUtils.getLoginUser(request);
         Task task = new Task();
-        User userA = null;
-        User userZ = null;
 
-        if (taskVO.getUserAName() != null && taskVO.getUserAName() != "") {
-            userA = userServiceImpl.getUserByName(taskVO.getUserAName());
-            if (userA == null) {
-                return JsonView.render(1, "任务创建失败，起飞员不存在！");
-            } else {
-                task.setUserA(userA.getId());
-            }
-        }
-        if (taskVO.getUserZName() != null && taskVO.getUserZName() != "") {
-
-            userZ = userServiceImpl.getUserByName(taskVO.getUserZName());
-            if (userZ == null) {
-                return JsonView.render(1, "任务创建失败，降落员不存在！");
-            } else {
-                task.setUserZ(userZ.getId());
-            }
-        }
         if (taskVO.getUavId() != null && taskVO.getUavId() != 0) {
             task.setUavId(taskVO.getUavId());
         }else {
@@ -285,7 +246,6 @@ public class TaskController {
         }
 
         task.setName(taskVO.getName());
-        //task.setCreatetime(new Date());
         task.setUsercreator(createUser.getId());
         // 初始状态为0创建
         task.setStatus(0);
@@ -363,12 +323,6 @@ public class TaskController {
     public String cancelTask(Task task) {
 
         if (taskServiceImpl.setTaskOver(task) == true) {
-            Task task2 = taskServiceImpl.getTaskByTask(task);
-            User userA = userServiceImpl.getUserById(task2.getUserA());
-            User userZ = userServiceImpl.getUserById(task2.getUserZ());
-
-            userServiceImpl.reduceTasknumByUser(userA); // 减少az任务数目
-            userServiceImpl.reduceTasknumByUser(userZ);
 
             return JsonView.render(1, "任务已取消！");
         } else {
@@ -376,52 +330,77 @@ public class TaskController {
         }
 
     }
-
-    // 拒绝放飞
-    @RequestMapping(value = "rejectFly", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public String rejectFly(Task task) {
-
-        if (taskServiceImpl.setStatusTaskByTask(task, 4) == true) {
-            return JsonView.render(1, "已驳回，不可放飞");
-        } else {
-            return JsonView.render(1, "驳回失败,请重试!");
-        }
-    }
-
     // 重启任务
     @RequestMapping(value = "reStartTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String reStartTask(Task task) {
 
-        if (taskServiceImpl.setStatusTaskByTask(task, 2) == true) {// 设置任务分派
-            return JsonView.render(1, "任务已重启，已分派到指定人员！");
+        if (taskServiceImpl.setStatusTaskByTask(task, 1) == true) {
+            return JsonView.render(1, "任务已重启！");
         } else {
             return JsonView.render(1, "任务重启失败，请重试!");
         }
     }
 
-    // 归档任务
-    @RequestMapping(value = "finishTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+
+    // 下发路径
+    @RequestMapping(value = "pushPathByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String finishTask(Task task) {
+    public String pushPathByTask(Task task) {
 
-        if (taskServiceImpl.setTaskOver(task) == true) {
-            Task task2 = taskServiceImpl.getTaskByTask(task);
-            User userA = userServiceImpl.getUserById(task2.getUserA());
-            User userZ = userServiceImpl.getUserById(task2.getUserZ());
+        if (taskServiceImpl.setStatusTaskByTask(task, 2) == true) {
+            //在这里连接机器人并下发路径
 
-            userServiceImpl.reduceTasknumByUser(userA); // 减少az任务数目
-            userServiceImpl.reduceTasknumByUser(userZ);
 
-            return JsonView.render(1, "任务已归档！");
+
+
+
+
+            return JsonView.render(1, "已下发路径！");
         } else {
-            return JsonView.render(1, "任务归档失败，请重试!");
+            return JsonView.render(1, "下发路径,请重试!");
         }
     }
 
+
+
+    // 启动机器人巡检
+    @RequestMapping(value = "startTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String startTask(Task task) {
+
+        if (taskServiceImpl.setStatusTaskByTask(task, 3) == true) {
+          //在这里启动机器人，然后开始巡检了
+
+
+
+
+
+            return JsonView.render(1, "巡检开始！");
+        } else {
+            return JsonView.render(1, "机器人启动失败，请重试!");
+        }
+    }
+
+
+    @RequestMapping(value = "onsureTaskOver", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String onsureTaskOver(Task task, HttpServletRequest request) {
+
+        if( taskServiceImpl.setStatusTaskByTask(task, 4)){
+            //在这里让机器人结束巡检
+
+
+
+            return JsonView.render(1, "巡视任务确认完成!");
+        }else{
+            return JsonView.render(1, "巡视任务确认失败!");
+        }
+    }
+
+
     // 下发路径    这个方法还没修改
-    @RequestMapping(value = "pushPathByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+   /* @RequestMapping(value = "pushPathByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String assignTask(Task task) throws InterruptedException {
 
@@ -434,7 +413,7 @@ public class TaskController {
         }
         if (task2.getFlyingpathId() == null || task2.getFlyingpathId() == 0) {
             return JsonView.render(1, "未指定飞行路径,任务分派失败!");
-        }
+        }*/
 
         //跨域请求创建文件夹
 //        String url = DETECT_SERVER + "makeTaskDir.action";
@@ -446,7 +425,7 @@ public class TaskController {
         //在这里下发飞行路径有关信息！！！！@hp
 
 
-         String alarmlistString = "success";
+       /*  String alarmlistString = "success";
 
         if (alarmlistString.equals("success")) {
             User userA = userServiceImpl.getUserById(task2.getUserA());
@@ -466,31 +445,9 @@ public class TaskController {
             return JsonView.render(1, "任务分派失败!");
         }
 
-    }
+    }*/
 
-    @RequestMapping(value = "onsureTaskOver", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public String onsureTaskOver(Task task, HttpServletRequest request) {
 
-        Task task2 = taskServiceImpl.getTaskByTask(task);
-        int status = task2.getStatus();
-
-        User userA = userServiceImpl.getUserById(task2.getUserA());
-        User userZ = userServiceImpl.getUserById(task2.getUserZ());
-
-        if (status == 9) {
-            taskServiceImpl.setStatusTaskByTask(task, 10);
-            taskServiceImpl.setFinishStatusTaskByTask(task, 1);
-
-            userServiceImpl.reduceTasknumByUser(userA); // 减少az任务数目
-            userServiceImpl.reduceTasknumByUser(userZ);
-
-            return JsonView.render(1, "巡视任务确认完成!");
-        } else {
-
-            return JsonView.render(1, "巡视任务确认失败!");
-        }
-    }
 
     // 删除处于创建状态的任务
     @RequestMapping(value = "deleteTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -555,7 +512,7 @@ public class TaskController {
     /**
      * 人员动态搜索提示
      */
-    @RequestMapping(value = "searchFlyer", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    /*@RequestMapping(value = "searchFlyer", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     @ResponseBody
     public String searchFlyerTips(@RequestParam(value = "queryString") String queryString,@RequestParam(value="departmentId") String departmentId) {
         List<String> userNameList = new ArrayList<>();
@@ -574,10 +531,10 @@ public class TaskController {
             return JsonView.render(1, msg);
         }
         return JsonView.render(0, WebConst.SUCCESS_RESULT, userNameList);
-    }
+    }*/
 
     // 获取任务的告警信息,同时显示告警信息
-    @RequestMapping(value = "alarmWithId", method = RequestMethod.GET)
+    /*@RequestMapping(value = "alarmWithId", method = RequestMethod.GET)
     public String getAlarmWithId(@RequestParam(value = "id") int id, Model model) {
         Task task = new Task();
         task.setId(id);
@@ -619,7 +576,7 @@ public class TaskController {
         model.addAttribute("alarmList", JsonUtils.objectToJson(alarmDetailVOList));
 
         return "alarmListWithTaskId";
-    }
+    }*/
 
 
 }
