@@ -152,7 +152,7 @@
                                                    <#if  taskpojo.task.status==2>
                                                        <#if !Session["super_administrator"]?exists>
                                                        <button type="button" class="btn green"
-                                                               onclick="startTask(${taskpojo.task.id!})">
+                                                               onclick="startTask(${taskpojo.task.id!},${taskpojo.deviceId!})">
                                                            <i class="icon-signin icon-white"></i>
                                                            <span>启动巡检</span>
                                                        </button>
@@ -169,7 +169,7 @@
                                                            <span>实时查看</span>
                                                        </button>
                                                        <button type="button" class="btn green"
-                                                               onclick="onsureTaskOver(${taskpojo.task.id!})">
+                                                               onclick="onsureTaskOver(${taskpojo.task.id!},${taskpojo.deviceId!})">
                                                            <i class="icon-signin icon-white"></i>
                                                            <span>完成巡检</span>
                                                        </button>
@@ -267,6 +267,7 @@
             </div>
         </div>
         <input type="text" id="startTaskId" style="display:none"/>
+        <input type="text" id="startRobotId" style="display:none"/>
     </div>
 </div>
 <!-- 任务启动确认 -->
@@ -290,6 +291,7 @@
             </div>
         </div>
         <input type="text" id="finishTaskId" style="display:none"/>
+        <input type="text" id="finishRobotId" style="display:none"/>
     </div>
 </div>
 <!-- 任务归档确认 -->
@@ -426,9 +428,10 @@
 
 
     //启动任务
-    function startTask(taskid) {
+    function startTask(taskid,robotId) {
 
         $('#startTaskId').val(taskid);
+        $('#startRobotId').val(robotId);
         Modal.show('startTaskConfirmModel');
     }
 
@@ -439,6 +442,7 @@
             url: "${s.base}/startTask.action",
             data: {
                 'id': $('#startTaskId').val(),
+                'robotId': $('#startRobotId').val()
             },
             success: function (result) {
 
@@ -468,7 +472,8 @@
             type: "post",
             url: "${s.base}/onsureTaskOver.action",
             data: {
-                'id': $('#finishTaskId').val()
+                'id': $('#finishTaskId').val(),
+                'robotId':  $('#finishRobotId').val();
             },
             success: function (result) {
                 if (result.errcode == 1) {
@@ -480,9 +485,11 @@
         });
     }
 
-    function onsureTaskOver(taskid) {
+    function onsureTaskOver(taskid,RobotId) {
 
         $('#finishTaskId').val(taskid);
+        $('#finishRobotId').val(RobotId);
+
         Modal.show('finishModel');
     }
 

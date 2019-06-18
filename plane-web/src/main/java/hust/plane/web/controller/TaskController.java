@@ -1,7 +1,6 @@
 package hust.plane.web.controller;
 
 
-import com.sun.jna.Library;
 import hust.plane.mapper.pojo.*;
 import hust.plane.service.interFace.*;
 import hust.plane.utils.DateKit;
@@ -10,8 +9,11 @@ import hust.plane.utils.PlaneUtils;
 import hust.plane.utils.page.TailPage;
 import hust.plane.utils.page.TaskPojo;
 import hust.plane.utils.pojo.JsonView;
-
-import hust.plane.web.controller.vo.*;
+import hust.plane.web.controller.vo.FlyingPathVO;
+import hust.plane.web.controller.vo.TaskVO;
+import hust.plane.web.controller.vo.UavVO;
+import hust.plane.web.robotoperation.CLibrary;
+import hust.plane.web.robotoperation.RobotManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import com.sun.jna.Native;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 @Controller
 public class TaskController {
@@ -365,11 +368,6 @@ public class TaskController {
         if (taskServiceImpl.setStatusTaskByTask(task, 2) == true) {
             //在这里连接机器人并下发路径
 
-
-
-
-
-
             return JsonView.render(1, "已下发路径！");
         } else {
             return JsonView.render(1, "下发路径,请重试!");
@@ -381,15 +379,14 @@ public class TaskController {
     // 启动机器人巡检
     @RequestMapping(value = "startTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String startTask(Task task) {
+    public String startTask(int id,Integer robotId) {
 
+        Task task = new Task();
+        task.setId(id);
         if (taskServiceImpl.setStatusTaskByTask(task, 3) == true) {
-          //在这里启动机器人，然后开始巡检了
-
-
-
-
-
+            CLibrary.ResultStruct resultStruct = RobotManager.resultStructMap.get(robotId);
+            //调用startTask函数
+            CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,id+"");
             return JsonView.render(1, "巡检开始！");
         } else {
             return JsonView.render(1, "机器人启动失败，请重试!");
@@ -399,13 +396,17 @@ public class TaskController {
 
     @RequestMapping(value = "onsureTaskOver", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String onsureTaskOver(Task task, HttpServletRequest request) {
+    public String onsureTaskOver(int id,Integer robotId, HttpServletRequest request) {
 
+        Task task = new Task();
+        task.setId(id);
         if( taskServiceImpl.setStatusTaskByTask(task, 4)){
             //在这里让机器人结束巡检
-
-
-
+            CLibrary.ResultStruct resultStruct = RobotManager.resultStructMap.get(robotId);
+            //调用结束任务函数
+            CLibrary.INSTANCE.stopTask(resultStruct,resultStruct.socketHandle);
+            //删除
+            RobotManager.resultStructMap.remove(robotId);
             return JsonView.render(1, "巡视任务确认完成!");
         }else{
             return JsonView.render(1, "巡视任务确认失败!");
