@@ -18,7 +18,7 @@ public class RobotOperationController {
     public String robotInit(String RemoteAddr,String UserName,String Pass,String RobotId)
     {
         //封装
-        CLibrary.ResultStruct resultStruct = new CLibrary.ResultStruct();
+        CLibrary.ResultStruct.ByReference resultStruct = new CLibrary.ResultStruct.ByReference();
         CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
         if(resultStruct.success)
         {

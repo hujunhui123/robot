@@ -10,10 +10,12 @@ import hust.plane.utils.page.TailPage;
 import hust.plane.utils.page.TaskPojo;
 import hust.plane.utils.pojo.JsonView;
 import hust.plane.web.controller.vo.FlyingPathVO;
+import hust.plane.web.controller.vo.RobotStatusVo;
 import hust.plane.web.controller.vo.TaskVO;
 import hust.plane.web.controller.vo.UavVO;
 import hust.plane.web.robotoperation.CLibrary;
 import hust.plane.web.robotoperation.RobotManager;
+import hust.plane.web.robotoperation.RobotStatusList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -354,12 +356,12 @@ public class TaskController {
         //System.out.println(RemoteAddr+"-"+UserName+"-"+Pass+"-"+RobotId+"-"+TaskId);
         //以下为连接逻辑
         //封装
-        CLibrary.ResultStruct resultStruct = new CLibrary.ResultStruct();
+        CLibrary.ResultStruct.ByReference resultStruct = new CLibrary.ResultStruct.ByReference();
         CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
         if(resultStruct.success)
         {
             //成功
-            RobotManager.resultStructMap.put(RobotId,resultStruct);
+            RobotManager.addResultStruct(RobotId,resultStruct);
             return JsonView.render(1, "机器人初始化成功！");
         }else{
             return JsonView.render(0, "机器人初始化失败！");
@@ -391,7 +393,7 @@ public class TaskController {
         Task task = new Task();
         task.setId(id);
         if (taskServiceImpl.setStatusTaskByTask(task, 3) == true) {
-            CLibrary.ResultStruct resultStruct = RobotManager.resultStructMap.get(robotId);
+            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId);
             //调用startTask函数
             CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,id+"");
             return JsonView.render(1, "巡检开始！");
@@ -409,11 +411,9 @@ public class TaskController {
         task.setId(id);
         if( taskServiceImpl.setStatusTaskByTask(task, 4)){
             //在这里让机器人结束巡检
-            CLibrary.ResultStruct resultStruct = RobotManager.resultStructMap.get(robotId);
+            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId);
             //调用结束任务函数
             CLibrary.INSTANCE.stopTask(resultStruct,resultStruct.socketHandle);
-            //删除
-            RobotManager.resultStructMap.remove(robotId);
             return JsonView.render(1, "巡视任务确认完成!");
         }else{
             return JsonView.render(1, "巡视任务确认失败!");
@@ -469,8 +469,6 @@ public class TaskController {
 
     }*/
 
-
-
     // 删除处于创建状态的任务
     @RequestMapping(value = "deleteTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
@@ -494,6 +492,7 @@ public class TaskController {
         Uav uav = new Uav();
         uav.setId(uavid);
         Uav uav2 = uavServiceImpl.getPlaneByPlane(uav);
+        String name =uav2.getName();
         UavVO uavVO = new UavVO(uav2);
         User user = PlaneUtils.getLoginUser(request);
         //判别是观察者和浏览者
@@ -506,7 +505,6 @@ public class TaskController {
             //是观察者
             role = "2";
         }
-
         Task task = new Task();
         task.setId(taskid);
         Task task1 = taskServiceImpl.getTaskByTask(task);
@@ -526,8 +524,72 @@ public class TaskController {
         model.addAttribute("task", taskVO);
         model.addAttribute("role", role);
         model.addAttribute("uav2", uav2);
-
         return "plane";
+    }
+
+    //向前台获取机器人的信息
+    @RequestMapping("")
+    @ResponseBody
+    public RobotStatusVo getRobotStatus(@RequestParam("uavid") Integer uavid)
+    {
+        CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
+        //通过机器人设备id获取socket句柄对象
+        CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct(uavid);
+        RobotStatusVo statusVo = new RobotStatusVo();
+        for(int i=0;i< RobotStatusList.CmdNameList.length;i++) {
+            CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, ResultStruct.socketHandle,RobotStatusList.CmdNameList[i]);
+            String statusValue = robotStatusStruct.statusValue;
+            if(!robotStatusStruct.success)
+            {
+                break;
+            }else {
+                switch (RobotStatusList.CmdNameList[i]) {
+                    case RobotStatusList.ST_LOCATION:
+                        statusVo.setLocation(statusValue);
+                        break;
+                    case RobotStatusList.ST_DANGLE:
+                        statusVo.setdAngle(statusValue);
+                        break;
+                    case RobotStatusList.ST_SPEED:
+                        statusVo.setSpeed(statusValue);
+                        break;
+                    case RobotStatusList.ST_TEMPTURE:
+                        statusVo.setdAngle(statusValue);
+                        break;
+                    case RobotStatusList.ST_BAT_VOL:
+                        statusVo.setLocation(statusValue);
+                        break;
+                    case RobotStatusList.ST_CHR_VOL:
+                        statusVo.setdAngle(statusValue);
+                        break;
+                    case RobotStatusList.ST_CHR_STA:
+                        statusVo.setLocation(statusValue);
+                        break;
+                    case RobotStatusList.ST_WORKEDTIME: {
+                        long ulv = Long.parseLong(statusValue);
+                        int iHour = (int) (ulv / 3600);
+                        int iMunite = (int) (ulv % 3600) / 60;
+                        int iSecond = (int) (ulv % 60);
+                        statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
+                        statusVo.setdAngle(statusValue);
+                    }
+                    break;
+                    case RobotStatusList.ST_REMAINBAT:
+                        statusVo.setLocation(statusValue);
+                        break;
+                    case RobotStatusList.ST_CEMARALIFT:
+                        statusVo.setdAngle(statusValue);
+                        break;
+                    case RobotStatusList.ST_WORKEDDIS:
+                        statusVo.setLocation(statusValue);
+                        break;
+                    case RobotStatusList.ST_CTRLMODE:
+                        statusVo.setdAngle(statusValue);
+                        break;
+                }
+            }
+        }
+        return statusVo;
     }
 
 

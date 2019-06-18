@@ -8,7 +8,18 @@ import java.util.concurrent.ConcurrentHashMap;
 //用于管理robot的管理配置
 public class RobotManager {
     //结果保存
-    public static ConcurrentHashMap<String,CLibrary.ResultStruct> resultStructMap = new ConcurrentHashMap<>();
+    public final static ConcurrentHashMap<String,CLibrary.ResultStruct.ByReference> resultStructMap = new ConcurrentHashMap<>();
+
+    //添加
+    public static void addResultStruct(String robotId,CLibrary.ResultStruct.ByReference r)
+    {
+        resultStructMap.put(robotId,r);
+    }
+    //获得
+    public static CLibrary.ResultStruct.ByReference getResultStruct(int robotId)
+    {
+        return resultStructMap.get(robotId+"");
+    }
 
 
 }
