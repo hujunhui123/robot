@@ -131,7 +131,7 @@
             </li>
             <li class="list-group-item">巡检任务名称：<span id="taskName">${task.name!}</span></li>
             <li class="list-group-item">任务MissionID：<span id="taskMissionId">${task.missionId!}</span></li>
-            <li class="list-group-item">飞行路径名称：<span id="flyingPathName"></span></li>
+            <li class="list-group-item">巡检路径名称：<span id="flyingPathName"></span></li>
             <li class="list-group-item">起飞员：<span>${task.userAName!}</span></li>
             <li class="list-group-item">降落员：<span>${task.userZName!}</span></li>
             <li class="list-group-item">无人机设备号：<span id="uavDeviceId"></span></li>
@@ -141,15 +141,18 @@
     </div>
     <div class="flyingInfo">
         <ul class="list-group">
-            <li class="list-group-item liheader"><b>无人机信息</b></li>
-            <li class="list-group-item">无人机空速：<span id="fightArSpd">暂无</span><span><strong>(m/s)</strong></span></li>
-            <li class="list-group-item">无人机地速：<span id="fightGrSpd">暂无</span><span><strong>(m/s)</strong></span></li>
-            <li class="list-group-item">无人机纬度：<span id="fightLat">暂无</span></li>
-            <li class="list-group-item">无人机经度：<span id="fightLon">暂无</span></li>
-            <li class="list-group-item">无人机海拔高度：<span id="fightElv">暂无</span></li>
-            <li class="list-group-item">无人机航向：<span id="fightHDG">暂无</span></li>
-            <li class="list-group-item">无人机水平倾角：<span id="fightHAgl">暂无</span></li>
-            <li class="list-group-item">无人机垂直倾角：<span id="fightGrVAgl">暂无</span></li>
+            <li class="list-group-item liheader"><b>机器人信息</b></li>
+            <li class="list-group-item">速度(m/s)：<span id="fightArSpd"></span></li>
+            <li class="list-group-item">当前温度：<span id="fightGrSpd"></span></li>
+            <li class="list-group-item">电池电压(v)：<span id="fightLat"></span></li>
+            <li class="list-group-item">充电电压(v)：<span id="fightLon"></span></li>
+            <li class="list-group-item">充电状态：<span id="fightElv"></span></li>
+            <li class="list-group-item">已工作时间：<span id="fightHDG"></span></li>
+            <li class="list-group-item">剩余电量(%)：<span id="fightHAgl"></span></li>
+            <li class="list-group-item">预计剩余时间：<span id="fightGrVAgl"></span></li>
+            <li class="list-group-item">升降杆状态：<span id="fightGanStatus"></span></li>
+            <li class="list-group-item">运行里程：<span id="fightDistance"></span></li>
+            <li class="list-group-item">工作模式：<span id="fightPattern"></span></li>
         </ul>
     </div>
 </div>

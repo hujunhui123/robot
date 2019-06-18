@@ -135,6 +135,11 @@
                                                 <td>
                                                    <#if  taskpojo.task.status==1>
                                                        <#if !Session["super_administrator"]?exists>
+                                                       <button type="button" class="btn green"
+                                                               onclick="connectRobotModel(${taskpojo.task.id!})">
+                                                           <i class="icon-signin icon-white"></i>
+                                                           <span>连接机器人</span>
+                                                       </button>
                                                            <button type="button" class="btn green"
                                                                    onclick="pushParh(${taskpojo.task.id!})">
                                                                <i class="icon-signin icon-white"></i>
@@ -289,7 +294,6 @@
 </div>
 <!-- 任务归档确认 -->
 
-
 <!-- 信息删除确认 -->
 <div class="modal fade" id="deleltconfirmModel" tabindex="-1" aria-hidden="true">
     <div class="modal_wapper">
@@ -311,6 +315,51 @@
     </div>
 </div>
 <!-- 信息删除确认 -->
+
+<!-- 机器人连接输入 -->
+<div class="modal fade" id="connectModel" tabindex="-1" aria-hidden="true">
+    <div class="modal_wapper">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">输入连接信息</h4>
+            </div>
+            <div class="modal-body" style="">
+                <div class="control-group">
+                    <label class="control-label">IP地址：</label>
+                    <div class="controls">
+                        <input type="text" class="span4" id="robotIP">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">用户名：</label>
+                    <div class="controls">
+                        <input type="text" class="span4" id="UserName" >
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">密码：</label>
+                    <div class="controls">
+                        <input type="text" class="span4" id="UserPwd">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">机器人ID：</label>
+                    <div class="controls">
+                        <input type="text" class="span4" id="robotId">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
+                <button type="button" class="btn blue" data-dismiss="modal">取消</button>
+                <button onclick="connectRobot()" class="btn red">连接</button>
+            </div>
+        </div>
+        <input type="text" id="connectTaskid" style="display:none"/>
+    </div>
+</div>
+<!--机器人连接输入 -->
 </div>
 
 
@@ -319,6 +368,35 @@
         App.init();
 
     });
+
+    //连接机器人
+    function connectRobotModel(taskid){
+        $('#connectTaskid').val(taskid);
+        Modal.show('connectModel');
+    }
+    function connectRobot(){
+
+        $.ajax({
+            type: "post",
+            url: "${s.base}/connectByTaskId.action",
+            data: {
+                "RemoteAddr":$("#robotIP").val(),
+                "UserName":$("#UserName").val(),
+                "Pass":$("#UserPwd").val(),
+                "RobotId":$("#robotId").val(),
+                "TaskId":$("#connectTaskid").val()
+            },
+            success: function (result) {
+                if (result.errcode == 1) {
+                    document.getElementById("resText").innerHTML = result.message;
+                    Modal.show('ocDialogModal');
+                    Modal.hide("connectModel");
+                }
+            }
+        });
+
+    }
+
 
     //下发路径
     function pushParh(taskid) {

@@ -1,18 +1,17 @@
 package hust.plane.web.controller;
 
-import hust.plane.constant.WebConst;
+
+import com.sun.jna.Library;
 import hust.plane.mapper.pojo.*;
 import hust.plane.service.interFace.*;
 import hust.plane.utils.DateKit;
-import hust.plane.utils.HttpClientUtil;
 import hust.plane.utils.JsonUtils;
 import hust.plane.utils.PlaneUtils;
 import hust.plane.utils.page.TailPage;
 import hust.plane.utils.page.TaskPojo;
 import hust.plane.utils.pojo.JsonView;
-import hust.plane.utils.pojo.TipException;
+
 import hust.plane.web.controller.vo.*;
-import hust.plane.web.controller.webUtils.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import com.sun.jna.Native;
+
 import java.util.*;
 
 @Controller
@@ -49,7 +47,6 @@ public class TaskController {
     @Value(value = "${uploadLocalHost}")
     private String FILE_UPLOAD_HOST;
 
-    
     @Autowired
     private TaskService taskServiceImpl;
     @Autowired
@@ -342,6 +339,23 @@ public class TaskController {
         }
     }
 
+    //连接无人机
+    @RequestMapping(value = "connectByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String connectByTaskId(@RequestParam("RemoteAddr") String RemoteAddr,
+                                  @RequestParam("UserName") String UserName,
+                                  @RequestParam("Pass") String Pass,
+                                  @RequestParam("RobotId") String RobotId,
+                                  @RequestParam("TaskId") String TaskId){
+
+        //System.out.println(RemoteAddr+"-"+UserName+"-"+Pass+"-"+RobotId+"-"+TaskId);
+        //以下为连接逻辑
+
+
+
+        return JsonView.render(1, "连接成功!");
+
+    }
 
     // 下发路径
     @RequestMapping(value = "pushPathByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
