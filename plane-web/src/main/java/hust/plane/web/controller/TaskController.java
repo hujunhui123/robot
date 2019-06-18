@@ -353,10 +353,17 @@ public class TaskController {
 
         //System.out.println(RemoteAddr+"-"+UserName+"-"+Pass+"-"+RobotId+"-"+TaskId);
         //以下为连接逻辑
-
-
-
-        return JsonView.render(1, "连接成功!");
+        //封装
+        CLibrary.ResultStruct resultStruct = new CLibrary.ResultStruct();
+        CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
+        if(resultStruct.success)
+        {
+            //成功
+            RobotManager.resultStructMap.put(RobotId,resultStruct);
+            return JsonView.render(1, "机器人初始化成功！");
+        }else{
+            return JsonView.render(0, "机器人初始化失败！");
+        }
 
     }
 
