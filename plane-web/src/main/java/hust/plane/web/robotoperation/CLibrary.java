@@ -3,7 +3,9 @@ package hust.plane.web.robotoperation;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;
+import com.sun.jna.win32.StdCallLibrary;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public interface CLibrary extends Library {
     //停止正在进行的移动过程
     void StopMoving(ResultStruct.ByReference pResultStruct, String SocketHandle);
     //定义响应结构体
-    public static class ResultStruct extends Structure {
+    public static class ResultStruct extends Structure{
         public boolean success;//是否成功初始化
         public String errorCode;//代pRobotStatusStruct表错误编码
         public String errorMessage;//代表不成功的原因
@@ -62,10 +64,8 @@ public interface CLibrary extends Library {
         public static class ByValue extends ResultStruct implements  Structure.ByValue{}
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{"success","errorCode","errorMessage","socketHandle"});
-        }
-        public String toString(){
-           return "success:"+success+",errorCode:"+errorCode+",errorMessgae:"+errorMessage;
+            return Arrays.asList(new String[]{"success","errorCode","errorMessage"
+            ,"errorMessage","socketHandle"});
         }
     }
 
