@@ -532,11 +532,12 @@ public class TaskController {
     @ResponseBody
     public RobotStatusVo getRobotStatus(@RequestParam("uavid") Integer uavid)
     {
-        CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
+
         //通过机器人设备id获取socket句柄对象
         CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct(uavid);
         RobotStatusVo statusVo = new RobotStatusVo();
         for(int i=0;i< RobotStatusList.CmdNameList.length;i++) {
+            CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
             CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, ResultStruct.socketHandle,RobotStatusList.CmdNameList[i]);
             String statusValue = robotStatusStruct.statusValue;
             if(!robotStatusStruct.success)
@@ -554,16 +555,16 @@ public class TaskController {
                         statusVo.setSpeed(statusValue);
                         break;
                     case RobotStatusList.ST_TEMPTURE:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setTempreture(statusValue);
                         break;
                     case RobotStatusList.ST_BAT_VOL:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setBatteryVoltage(statusValue);
                         break;
                     case RobotStatusList.ST_CHR_VOL:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setChargeVoltage(statusValue);
                         break;
                     case RobotStatusList.ST_CHR_STA:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setChargeStatus(statusValue);
                         break;
                     case RobotStatusList.ST_WORKEDTIME: {
                         long ulv = Long.parseLong(statusValue);
@@ -571,20 +572,20 @@ public class TaskController {
                         int iMunite = (int) (ulv % 3600) / 60;
                         int iSecond = (int) (ulv % 60);
                         statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setWorkedTime(statusValue);
                     }
                     break;
                     case RobotStatusList.ST_REMAINBAT:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setRemainBattery(statusValue);
                         break;
                     case RobotStatusList.ST_CEMARALIFT:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setCemaraLift(statusValue);
                         break;
                     case RobotStatusList.ST_WORKEDDIS:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setWorkedDis(statusValue);
                         break;
                     case RobotStatusList.ST_CTRLMODE:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setControlMode(statusValue);
                         break;
                 }
             }

@@ -4,6 +4,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Structure;
 import com.sun.jna.win32.StdCallLibrary;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,7 +12,8 @@ import java.util.List;
  * Created by hp on 2019/6/18.
  */
 public interface CLibrary extends StdCallLibrary {
-    CLibrary INSTANCE = Native.load("RosWebCtrl",CLibrary.class);
+    String path =System.getProperty("user.dir").concat(File.separator);
+    CLibrary INSTANCE = Native.load(path.concat("RosWebCtrl"),CLibrary.class);
     //初始化函数
     void init(ResultStruct.ByReference pResultStruct,String RemoteAddr,String UserName,String Pass,String RobotId);
     //检查是否初始化
@@ -75,7 +77,7 @@ public interface CLibrary extends StdCallLibrary {
         @Override
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"success","errorCode","errorMessage"
-                    ,"errorMessage","statusValue"});
+                    ,"statusValue"});
         }
     }
     public static class CheckPointStruct extends Structure{
@@ -94,6 +96,11 @@ public interface CLibrary extends StdCallLibrary {
         protected List<String> getFieldOrder() {
             return Arrays.asList(new String[]{"batchId","checkPointId","dx","dy","aAngle"
                     ,"roadWith","raiseLift"});
+        }
+
+        public static void main(String[] args) {
+            String path =System.getProperty("user.dir".concat(File.separator));
+            System.out.println(path);
         }
     }
 
