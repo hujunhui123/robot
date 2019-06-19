@@ -18,6 +18,26 @@ public class RobotStatusVo {
     private String WorkedDis;
     private String controlMode;
 
+
+    @Override
+    public String toString() {
+        return "RobotStatusVo{" +
+                "location='" + location + '\'' +
+                ", dAngle='" + dAngle + '\'' +
+                ", speed='" + speed + '\'' +
+                ", tempreture='" + tempreture + '\'' +
+                ", batteryVoltage='" + batteryVoltage + '\'' +
+                ", chargeVoltage='" + chargeVoltage + '\'' +
+                ", chargeStatus='" + chargeStatus + '\'' +
+                ", workedTime='" + workedTime + '\'' +
+                ", remainBattery='" + remainBattery + '\'' +
+                ", remainTime='" + remainTime + '\'' +
+                ", cemaraLift='" + cemaraLift + '\'' +
+                ", WorkedDis='" + WorkedDis + '\'' +
+                ", controlMode='" + controlMode + '\'' +
+                '}';
+    }
+
     public String getLocation() {
         return location;
     }
@@ -121,4 +141,5 @@ public class RobotStatusVo {
     public void setControlMode(String controlMode) {
         this.controlMode = controlMode;
     }
+
 }

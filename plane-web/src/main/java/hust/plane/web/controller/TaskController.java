@@ -35,7 +35,7 @@ import java.util.List;
 
 @Controller
 public class TaskController {
-	
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskController.class);
     @Value(value = "${BASE_IMAGE_URL}")    //访问图片的地址
     private String BASE_IMAGE_URL;
@@ -231,8 +231,8 @@ public class TaskController {
 
         if (taskVO.getUavId() != null && taskVO.getUavId() != 0) {
             task.setUavId(taskVO.getUavId());
-        }else {
-        	task.setUavId(null);
+        } else {
+            task.setUavId(null);
         }
         if (taskVO.getFlyingpathId() != null && taskVO.getFlyingpathId() != 0) {
             task.setFlyingpathId(taskVO.getFlyingpathId());
@@ -332,6 +332,7 @@ public class TaskController {
         }
 
     }
+
     // 重启任务
     @RequestMapping(value = "reStartTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
@@ -351,19 +352,18 @@ public class TaskController {
                                   @RequestParam("UserName") String UserName,
                                   @RequestParam("Pass") String Pass,
                                   @RequestParam("RobotId") String RobotId,
-                                  @RequestParam("TaskId") String TaskId){
+                                  @RequestParam("TaskId") String TaskId) {
 
-        //System.out.println(RemoteAddr+"-"+UserName+"-"+Pass+"-"+RobotId+"-"+TaskId);
+        System.out.println(RemoteAddr + "-" + UserName + "-" + Pass + "-" + RobotId + "-" + TaskId);
         //以下为连接逻辑
         //封装
         CLibrary.ResultStruct.ByReference resultStruct = new CLibrary.ResultStruct.ByReference();
-        CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
-        if(resultStruct.success)
-        {
+        CLibrary.INSTANCE.init(resultStruct, RemoteAddr, UserName, Pass, RobotId);
+        if (resultStruct.success) {
             //成功
-            RobotManager.addResultStruct(RobotId,resultStruct);
+            RobotManager.addResultStruct(RobotId, resultStruct);
             return JsonView.render(1, "机器人初始化成功！");
-        }else{
+        } else {
             return JsonView.render(0, "机器人初始化失败！");
         }
 
@@ -384,18 +384,18 @@ public class TaskController {
     }
 
 
-
     // 启动机器人巡检
     @RequestMapping(value = "startTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String startTask(int id,Integer robotId) {
+    public String startTask(int id, Integer robotId) {
 
         Task task = new Task();
         task.setId(id);
         if (taskServiceImpl.setStatusTaskByTask(task, 3) == true) {
             CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId);
             //调用startTask函数
-            CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,id+"");
+            CLibrary.INSTANCE.startTask(resultStruct, resultStruct.socketHandle, id + "");
+
             return JsonView.render(1, "巡检开始！");
         } else {
             return JsonView.render(1, "机器人启动失败，请重试!");
@@ -405,17 +405,17 @@ public class TaskController {
 
     @RequestMapping(value = "onsureTaskOver", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String onsureTaskOver(int id,Integer robotId, HttpServletRequest request) {
+    public String onsureTaskOver(int id, Integer robotId, HttpServletRequest request) {
 
         Task task = new Task();
         task.setId(id);
-        if( taskServiceImpl.setStatusTaskByTask(task, 4)){
+        if (taskServiceImpl.setStatusTaskByTask(task, 4)) {
             //在这里让机器人结束巡检
             CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId);
             //调用结束任务函数
-            CLibrary.INSTANCE.stopTask(resultStruct,resultStruct.socketHandle);
+            CLibrary.INSTANCE.stopTask(resultStruct, resultStruct.socketHandle);
             return JsonView.render(1, "巡视任务确认完成!");
-        }else{
+        } else {
             return JsonView.render(1, "巡视任务确认失败!");
         }
     }
@@ -437,14 +437,14 @@ public class TaskController {
             return JsonView.render(1, "未指定飞行路径,任务分派失败!");
         }*/
 
-        //跨域请求创建文件夹
+    //跨域请求创建文件夹
 //        String url = DETECT_SERVER + "makeTaskDir.action";
 //        Map<String, String> params = new HashMap<String, String>();
 //        params.put("missionId", "" + task2.getMissionId());
 //        String alarmlistString = HttpClientUtil.doPost(url, params);
 //        System.out.println(alarmlistString);
 
-        //在这里下发飞行路径有关信息！！！！@hp
+    //在这里下发飞行路径有关信息！！！！@hp
 
 
        /*  String alarmlistString = "success";
@@ -492,7 +492,7 @@ public class TaskController {
         Uav uav = new Uav();
         uav.setId(uavid);
         Uav uav2 = uavServiceImpl.getPlaneByPlane(uav);
-        String name =uav2.getName();
+        String name = uav2.getName();
         UavVO uavVO = new UavVO(uav2);
         User user = PlaneUtils.getLoginUser(request);
         //判别是观察者和浏览者
@@ -528,21 +528,20 @@ public class TaskController {
     }
 
     //向前台获取机器人的信息
-    @RequestMapping("")
+    @RequestMapping("getRobotInfo")
     @ResponseBody
-    public RobotStatusVo getRobotStatus(@RequestParam("uavid") Integer uavid)
-    {
+    public RobotStatusVo getRobotStatus(@RequestParam("uavid") Integer uavid) {
+
         CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
         //通过机器人设备id获取socket句柄对象
         CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct(uavid);
         RobotStatusVo statusVo = new RobotStatusVo();
-        for(int i=0;i< RobotStatusList.CmdNameList.length;i++) {
-            CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, ResultStruct.socketHandle,RobotStatusList.CmdNameList[i]);
+        for (int i = 0; i < RobotStatusList.CmdNameList.length; i++) {
+            CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, ResultStruct.socketHandle, RobotStatusList.CmdNameList[i]);
             String statusValue = robotStatusStruct.statusValue;
-            if(!robotStatusStruct.success)
-            {
+            if (!robotStatusStruct.success) {
                 break;
-            }else {
+            } else {
                 switch (RobotStatusList.CmdNameList[i]) {
                     case RobotStatusList.ST_LOCATION:
                         statusVo.setLocation(statusValue);
@@ -554,37 +553,39 @@ public class TaskController {
                         statusVo.setSpeed(statusValue);
                         break;
                     case RobotStatusList.ST_TEMPTURE:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setTempreture(statusValue);
                         break;
                     case RobotStatusList.ST_BAT_VOL:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setBatteryVoltage(statusValue);
                         break;
                     case RobotStatusList.ST_CHR_VOL:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setChargeVoltage(statusValue);
                         break;
                     case RobotStatusList.ST_CHR_STA:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setChargeStatus(statusValue);
                         break;
                     case RobotStatusList.ST_WORKEDTIME: {
-                        long ulv = Long.parseLong(statusValue);
-                        int iHour = (int) (ulv / 3600);
-                        int iMunite = (int) (ulv % 3600) / 60;
-                        int iSecond = (int) (ulv % 60);
-                        statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
-                        statusVo.setdAngle(statusValue);
+//                        long ulv = Long.parseLong(statusValue);
+//                        int iHour = (int) (ulv / 3600);
+//                        int iMunite = (int) (ulv % 3600) / 60;
+//                        int iSecond = (int) (ulv % 60);
+//                        statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
+//                        statusVo.setWorkedTime(statusValue);
                     }
                     break;
                     case RobotStatusList.ST_REMAINBAT:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setRemainBattery(statusValue);
                         break;
                     case RobotStatusList.ST_CEMARALIFT:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setCemaraLift(statusValue);
                         break;
                     case RobotStatusList.ST_WORKEDDIS:
-                        statusVo.setLocation(statusValue);
+                        statusVo.setWorkedDis(statusValue);
                         break;
                     case RobotStatusList.ST_CTRLMODE:
-                        statusVo.setdAngle(statusValue);
+                        statusVo.setControlMode(statusValue);
+                        break;
+                    default:
                         break;
                 }
             }

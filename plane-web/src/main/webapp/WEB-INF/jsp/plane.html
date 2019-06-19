@@ -237,18 +237,51 @@
         }
     }
 
-    drag();   //div拖动初始化
+    drag();
 </script>
 <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
 <script type="text/javascript">
-
     var uavdata = ${uav};
     var flyingPath = ${path};
-
+    var robotid = uavdata.deviceid;
     $("#flyingPathName").html(flyingPath.name);
     $("#uavDeviceId").html(uavdata.deviceid);
     $("#uavName").html(uavdata.name);
     $("#uavDescription").html(uavdata.description);
+
+    function SendXHR() {
+        $.ajax({
+            type: "post", //AJAX请求类型
+            url: "${s.base}/getRobotInfo.action", //请求url
+            data:{
+                "uavid":robotid,
+            },
+            cache: false,  //无缓存
+            timeout: 1000 * 80,  //AJAX请求超时时间为60秒
+            success: function (res) {
+                //var t=setTimeout("alert(robotid)",1000);
+                //alert(1);
+                console.log(res);
+                //SendXHR();//请求后立即发起AJAX请求
+            },
+            error: function () {
+                console.log("机器人数据查询失败");
+            }
+
+        });
+    }
+
+    setInterval(SendXHR,2000);
+
+    // window.onload = function () {
+    //     SendXHR();
+    // }
+
+
+
+
+
+
 
 </script>
 

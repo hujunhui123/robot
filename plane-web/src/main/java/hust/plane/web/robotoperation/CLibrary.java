@@ -1,8 +1,8 @@
 package hust.plane.web.robotoperation;
 
+import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;
-import com.sun.jna.win32.StdCallLibrary;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +10,13 @@ import java.util.List;
 /**
  * Created by hp on 2019/6/18.
  */
-public interface CLibrary extends StdCallLibrary {
+public interface CLibrary extends Library {
+
+     //CLibrary INSTANCE = Native.load("F:\\RosWebCtrl",CLibrary.class);
+    //CLibrary INSTANCE = (CLibrary) Native.load("RosWebCtrl",CLibrary.class);
+
     CLibrary INSTANCE = Native.load("RosWebCtrl",CLibrary.class);
+
     //初始化函数
     void init(ResultStruct.ByReference pResultStruct,String RemoteAddr,String UserName,String Pass,String RobotId);
     //检查是否初始化
@@ -46,7 +51,7 @@ public interface CLibrary extends StdCallLibrary {
     //停止正在进行的移动过程
     void StopMoving(ResultStruct.ByReference pResultStruct, String SocketHandle);
     //定义响应结构体
-    public static class ResultStruct extends Structure{
+    public static class ResultStruct extends Structure {
         public boolean success;//是否成功初始化
         public String errorCode;//代pRobotStatusStruct表错误编码
         public String errorMessage;//代表不成功的原因
@@ -57,8 +62,10 @@ public interface CLibrary extends StdCallLibrary {
         public static class ByValue extends ResultStruct implements  Structure.ByValue{}
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{"success","errorCode","errorMessage"
-            ,"errorMessage","socketHandle"});
+            return Arrays.asList(new String[]{"success","errorCode","errorMessage","socketHandle"});
+        }
+        public String toString(){
+           return "success:"+success+",errorCode:"+errorCode+",errorMessgae:"+errorMessage;
         }
     }
 
@@ -74,8 +81,17 @@ public interface CLibrary extends StdCallLibrary {
         public static class ByValue extends RobotStatusStruct implements  Structure.ByValue{}
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{"success","errorCode","errorMessage"
-                    ,"errorMessage","statusValue"});
+            return Arrays.asList(new String[]{"success","errorCode","errorMessage","statusValue"});
+        }
+
+        @Override
+        public String toString() {
+            return "RobotStatusStruct{" +
+                    "success=" + success +
+                    ", errorCode='" + errorCode + '\'' +
+                    ", errorMessage='" + errorMessage + '\'' +
+                    ", statusValue='" + statusValue + '\'' +
+                    '}';
         }
     }
     public static class CheckPointStruct extends Structure{
