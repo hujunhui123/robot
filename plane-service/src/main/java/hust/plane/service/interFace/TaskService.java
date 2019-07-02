@@ -43,4 +43,6 @@ public interface TaskService {
     List<Task> getFlyingPathByFlyingId(Integer id);
 
     List<Task> getTaskByCreatorAndStatus(User user, Integer status);
+
+    Task getTaskByTaskId(Integer id);
 }

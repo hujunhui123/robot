@@ -59,9 +59,10 @@ public class FileServiceImpl implements FileService {
             infoPointMapper.insertInfoPointList(infoPoints);
 
             return true;
-        } else
+        } else {
             return false;
-	}
+        }
+    }
 
     
     //从excel读取飞行路径，并且写入数据库
@@ -84,6 +85,16 @@ public class FileServiceImpl implements FileService {
         return false;
     }
 
-	
+    @Override
+    public boolean insetFlyingPath(FlyingPath flyingPath) {
+
+        if(flyingPathMapper.insertFlyingPath(flyingPath) ==1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
 }

@@ -54,10 +54,12 @@ public class UavServiceImpl implements UavService {
 
     @Override
     public boolean insertUav(Uav uav) {
-        if(uavMapper.insertUav(uav) == 1)
+        if(uavMapper.insertUav(uav) == 1){
             return true;
-        else
+        }
+        else{
             return false;
+    }
     }
 
 

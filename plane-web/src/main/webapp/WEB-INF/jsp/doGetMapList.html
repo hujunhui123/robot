@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>路径一览</title>
+    <title>地图一览</title>
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,20 +42,15 @@
     <div class="page-content">
         <!-- BEGIN PAGE CONTAINER-->
         <div class="container-fluid">
-            <!--  下面这块内容是在页面写死的  -->
-            <!-- <h4 class="page-title">飞巡路径
-                 <small>路径一览</small>
-             </h4>-->
 
             <h4 class="page-title"></h4>
-
             <ul class="breadcrumb">
                 <li>
                     <i class="icon-home"></i>
                     <a href="#">巡检路径</a>
                     <i class="icon-angle-right"></i>
                 </li>
-                <li><a href="${s.base}/doGetFlyingPathList.action">路径一览</a></li>
+                <li><a href="${s.base}/doGetFlyingPathList.action">地图一览</a></li>
             </ul>
         </div>
         <!-- END PAGE TITLE & BREADCRUMB-->
@@ -69,24 +64,21 @@
                             <!-- BEGIN EXAMPLE TABLE PORTLET-->
                             <div class="portlet box yellow">
                                 <div class="portlet-title">
-                                    <div class="caption"><i class="icon-edit"></i>路径列表</div>
+                                    <div class="caption"><i class="icon-edit"></i>地图列表</div>
                                 </div>
                                 <div class="portlet-body">
-                                    <div class="" style="float: right;">
-                                        <input name="name" type="text" value="${inputName!}" placeholder="请输入巡检路径名称"
-                                               class="search-text" style="margin-bottom: 8px;">
-                                        <input type="submit" class="btn green" style="height: 30px;margin-bottom: 8px;">
-                                    </div>
+                                    <#--<div class="" style="float: right;">-->
+                                        <#--<input name="name" type="text" value="${inputName!}" placeholder="请输入巡检路径名称"-->
+                                               <#--class="search-text" style="margin-bottom: 8px;">-->
+                                        <#--<input type="submit" class="btn green" style="height: 30px;margin-bottom: 8px;">-->
+                                    <#--</div>-->
                                     <table class="table table-striped table-hover table-bordered dataTable"
                                            id="sample_editable_1">
                                         <thead>
                                         <tr>
-                                            <th>巡检路径编号</th>
-                                            <th>巡检路径名称</th>
-                                            <th>描述</th>
+                                            <th>地图编号</th>
+                                            <th>地图名称</th>
                                             <th>创建时间</th>
-                                            <th>更新时间</th>
-                                            <th>地理位置</th>
                                             <#if !Session["super_administrator"]?exists>
                                             <th>操作</th>
                                             </#if>
@@ -97,21 +89,14 @@
                                                 <#list page.items as planepath>
                                                     <td>${planepath.id}</td>
                                                     <td>${planepath.name}</td>
-                                                    <td>${planepath.description!}</td>
                                                     <td>${planepath.createtime?datetime}</td>
-
-                                                    <td><a href="${s.base}/showPlanePath.action?id=${planepath.id}"
-                                                           target="_blank">详细信息</a></td>
                                                     <#if !Session["super_administrator"]?exists>
                                                     <td>
-                                                        <a href="${s.base}/toTaskCreate?flyingpathId=${planepath.id}"
-                                                           class="btn green">创建任务</a>
                                                         <a class="btn red"
-                                                           onclick='deletePlanePath("${planepath.id!}")'>删除路径</a>
-                                                        <#--<a class="btn blue"-->
-                                                           <#--onclick='exportPlanePath(${planepath.id!},${planepath.heightdata!})'-->
-                                                           <#--style="cursor: pointer;">导出路径</a>-->
-                                                           </td>
+                                                           onclick='deleteMap("123")'>删除地图</a>
+                                                        <a href="${s.base}/doSetFlyPath?MapId=123"
+                                                           class="btn green">设定路径</a>
+                                                    </td>
                                                     </#if>
                                                     </tr>
                                                 </#list>
@@ -203,7 +188,7 @@
         });
     }
 
-    function deletePlanePath(id) {
+    function deleteMap(id) {
 
         $('#planepathid').val(id);
         $('#deleltconfirmModel').modal();

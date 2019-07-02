@@ -5,6 +5,7 @@ import hust.plane.mapper.pojo.*;
 import hust.plane.service.interFace.*;
 import hust.plane.utils.DateKit;
 import hust.plane.utils.JsonUtils;
+import hust.plane.utils.LineUtil;
 import hust.plane.utils.PlaneUtils;
 import hust.plane.utils.page.TailPage;
 import hust.plane.utils.page.TaskPojo;
@@ -107,7 +108,6 @@ public class TaskController {
         model.addAttribute("curNav", "home");
         return "home";
     }
-
 
     // 跳转任务创建
     @RequestMapping("/toTaskCreate")
@@ -289,35 +289,6 @@ public class TaskController {
         return "taskList";
     }
 
-    // 时间逆序查询
-    @RequestMapping(value = "timeReverseView", method = RequestMethod.GET)
-    public String timeReverseView(Task task, TailPage<TaskPojo> page, Model model, HttpServletRequest request) {
-
-        User userCreator = PlaneUtils.getLoginUser(request);
-        List<Integer> groupIdList = userGroupService.selectGroupIdWithUserId(userCreator.getId());
-        if (groupIdList.contains(Integer.valueOf(1))) {
-            task.setUsercreator(null);
-        } else {
-            task.setUsercreator(userCreator.getId());
-        }
-        if (task.getName() == "" || task.getName() == null) {
-            task.setName(null);
-        } else {
-            model.addAttribute("inputName", task.getName());
-        }
-        if (task.getFinishstatus() == null || task.getFinishstatus() == -1) {
-            task.setFinishstatus(null);
-        } else {
-            model.addAttribute("selectStatus", task.getFinishstatus());
-        }
-
-        page = taskServiceImpl.queryPage(task, page);
-
-        model.addAttribute("page", page);
-        model.addAttribute("curNav", "taskAllList");
-        return "taskList";
-    }
-
 
     //取消任务
     @RequestMapping(value = "cancelTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -348,23 +319,22 @@ public class TaskController {
     @RequestMapping(value = "connectByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String connectByTaskId(@RequestParam("RemoteAddr") String RemoteAddr,
-                                  @RequestParam("UserName") String UserName,
-                                  @RequestParam("Pass") String Pass,
-                                  @RequestParam("RobotId") String RobotId,
-                                  @RequestParam("TaskId") String TaskId){
+                                  @RequestParam("TaskId") Integer id){
 
         //System.out.println(RemoteAddr+"-"+UserName+"-"+Pass+"-"+RobotId+"-"+TaskId);
         //以下为连接逻辑
         //封装
+        Task task = taskServiceImpl.getTaskByTaskId(id);
+        Uav uav = uavServiceImpl.getUavById(task.getUavId());
         CLibrary.ResultStruct.ByReference resultStruct = new CLibrary.ResultStruct.ByReference();
-        CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
+        CLibrary.INSTANCE.init(resultStruct,RemoteAddr,uav.getName(),uav.getPassword(),uav.getId()+"");
         if(resultStruct.success)
         {
             //成功
-            RobotManager.addResultStruct(RobotId,resultStruct);
+            RobotManager.addResultStruct(task.getUavId()+"",resultStruct);
             return JsonView.render(1, "机器人初始化成功！");
         }else{
-            return JsonView.render(0, "机器人初始化失败！");
+            return JsonView.render(1, "机器人初始化失败！");
         }
 
     }
@@ -374,12 +344,33 @@ public class TaskController {
     @ResponseBody
     public String pushPathByTask(Task task) {
 
+        Task take1 = taskServiceImpl.getTaskByTask(task);
         if (taskServiceImpl.setStatusTaskByTask(task, 2) == true) {
+            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(take1.getUavId());
             //在这里连接机器人并下发路径
+            //测试下发路径
 
-            return JsonView.render(1, "已下发路径！");
+            //下方代码为正式代码
+//            task = taskServiceImpl.getTaskByTask(task);
+//            FlyingPath flyingPath = flyingPathServiceImpl.getFlyingPathById(task.getFlyingpathId());
+//            ArrayList<ArrayList<Double>> points = LineUtil.stringLineToList(flyingPath.getPathdata());
+//            for(ArrayList<Double> point:points){
+//                  //把每个点都发给机器人
+//                CLibrary.INSTANCE.moveToRelativePoint(resultStruct,resultStruct.socketHandle,point.get(0), point.get(1));
+//            }
+
+//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.1, 90);
+//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.2, 100);
+//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.3, 110);
+//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.4, 120);
+//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.5, 130);
+
+            if(resultStruct.success){
+                return JsonView.render(1, "已下发路径！");
+            }
+            return JsonView.render(1, "下发路径失败");
         } else {
-            return JsonView.render(1, "下发路径,请重试!");
+            return JsonView.render(1, "未连接,请重试!");
         }
     }
 
@@ -566,12 +557,12 @@ public class TaskController {
                         statusVo.setLocation(statusValue);
                         break;
                     case RobotStatusList.ST_WORKEDTIME: {
-//                        long ulv = Long.parseLong(statusValue);
-//                        int iHour = (int) (ulv / 3600);
-//                        int iMunite = (int) (ulv % 3600) / 60;
-//                        int iSecond = (int) (ulv % 60);
-//                        statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
-//                        statusVo.setWorkedTime(statusValue);
+                        long ulv = Long.parseLong(statusValue);
+                        int iHour = (int) (ulv / 3600);
+                        int iMunite = (int) (ulv % 3600) / 60;
+                        int iSecond = (int) (ulv % 60);
+                        statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
+                        statusVo.setWorkedTime(statusValue);
                     }
                     break;
                     case RobotStatusList.ST_REMAINBAT:

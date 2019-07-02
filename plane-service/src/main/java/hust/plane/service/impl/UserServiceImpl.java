@@ -249,19 +249,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updataTasknumByUser(User user) {
         // TODO Auto-generated method stub
-        if (userDao.userAddTasknum(user) == 1)
+        if (userDao.userAddTasknum(user) == 1){
             return true;
-        else
+        }
+        else{
             return false;
+        }
     }
 
     @Override
     public boolean reduceTasknumByUser(User user) {
 
-        if (userDao.userReduceTasknum(user) == 1)
+        if (userDao.userReduceTasknum(user) == 1){
             return true;
-        else
+        }
+        else{
             return false;
+        }
     }
 
     @Override
@@ -453,8 +457,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByName(String name) {
         User user = userDao.getUserByName(name);
-        if (user.getId() != null && user.getId() != 0)
+        if (user.getId() != null && user.getId() != 0){
             return user;
+        }
         return null;
     }
 

@@ -12,9 +12,9 @@
     <script src="http://cache.amap.com/lbs/static/es5.min.js"></script>
     <script type="text/javascript" src='//webapi.amap.com/maps?v=1.4.6&key=82f9e75505b649be9ab81a45ae34aa14'></script>
 
-    <script type="text/javascript" src="${s.base}/res/js/WGS84_to_GCJ02.js"></script>
+    <#--<script type="text/javascript" src="${s.base}/res/js/WGS84_to_GCJ02.js"></script>-->
     <script type="text/javascript" src="${s.base}/res/js/home.js"></script>
-    <script type="text/javascript" src="${s.base}/res/js/chat.js"></script>
+    <#--<script type="text/javascript" src="${s.base}/res/js/chat.js"></script>-->
 
     <link href="${s.base}/res/assets/video-js.css" rel="stylesheet"/>
     <script src="${s.base}/res/assets/videojs-ie8.min.js"></script>
@@ -91,10 +91,20 @@
     #showSelections .checkbox-inline input {
         margin-top: 10px !important;
     }
-    #igggg{
-        position: fixed;
-        width: 30%;
-        background-size: cover;
+
+    #container{
+        /*text-align: center;*/
+        position: relative;
+        margin-top: 5px;
+    }
+    #myCanvas{
+        border:1px solid red;
+        position: absolute;
+        z-index: 1;
+    }
+    #bg{
+        /*位置绝对*/
+        position: absolute;
     }
 
 </style>
@@ -105,6 +115,12 @@
 <input type="hidden" id="peoplerole" value="${role!}"><br/>
 <div class="headerUav" style="font-size:2.0rem;">
     <font size="4">机器人状态：<span id="fightStatus">暂未连接</span></font>
+</div>
+
+
+<div id="container">
+    <canvas id="myCanvas"></canvas>
+    <img src="" id="bg">
 </div>
 
 <div class="main-wrapVideo" id="videoDiv">
@@ -132,11 +148,9 @@
             <li class="list-group-item">巡检任务名称：<span id="taskName">${task.name!}</span></li>
             <li class="list-group-item">任务MissionID：<span id="taskMissionId">${task.missionId!}</span></li>
             <li class="list-group-item">巡检路径名称：<span id="flyingPathName"></span></li>
-            <li class="list-group-item">起飞员：<span>${task.userAName!}</span></li>
-            <li class="list-group-item">降落员：<span>${task.userZName!}</span></li>
-            <li class="list-group-item">无人机设备号：<span id="uavDeviceId"></span></li>
-            <li class="list-group-item">无人机名称：<span id="uavName"></span></li>
-            <li class="list-group-item">无人机描述：<span id="uavDescription"></span></li>
+            <li class="list-group-item">机器人设备号：<span id="uavDeviceId"></span></li>
+            <li class="list-group-item">机器人名称：<span id="uavName"></span></li>
+            <li class="list-group-item">机器人描述：<span id="uavDescription"></span></li>
         </ul>
     </div>
     <div class="flyingInfo">
@@ -156,9 +170,7 @@
         </ul>
     </div>
 </div>
-<div id="container">
-<img src="${s.base}/res/i/map.bmp" id="igggg">
-</div>
+
 
 <!-- UI组件库 1.0 -->
 <script src="${s.base}/res/assets/video.js"></script>
@@ -238,6 +250,8 @@
     }
 
     drag();
+
+
 </script>
 <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
 <script type="text/javascript">
@@ -249,14 +263,24 @@
     $("#uavName").html(uavdata.name);
     $("#uavDescription").html(uavdata.description);
 
+    var img_url = '${s.base}/res/upload/'+flyingPath.name+'.bmp';
+    // 创建对象
+    var img = new Image();
+    // 改变图片的src
+    img.src = img_url;
+    document.getElementById('myCanvas').width = img.width;
+    document.getElementById('myCanvas').height = img.height;
+    //设置画布的背景图
+    $("#bg").attr('src',img_url);
+
     function SendXHR() {
         $.ajax({
-            type: "post", //AJAX请求类型
-            url: "${s.base}/getRobotInfo.action", //请求url
+            type: "post",
+            url: "${s.base}/getRobotInfo.action",
             data:{
                 "uavid":robotid,
             },
-            cache: false,  //无缓存
+            cache: false,
             timeout: 1000 * 80,  //AJAX请求超时时间为60秒
             success: function (res) {
                 //var t=setTimeout("alert(robotid)",1000);
@@ -271,17 +295,11 @@
         });
     }
 
-    setInterval(SendXHR,2000);
+   // setInterval(SendXHR,2000);
 
     // window.onload = function () {
     //     SendXHR();
     // }
-
-
-
-
-
-
 
 </script>
 

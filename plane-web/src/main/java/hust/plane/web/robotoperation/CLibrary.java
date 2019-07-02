@@ -16,16 +16,13 @@ public interface CLibrary extends Library {
 
      //CLibrary INSTANCE = Native.load("F:\\RosWebCtrl",CLibrary.class);
     //CLibrary INSTANCE = (CLibrary) Native.load("RosWebCtrl",CLibrary.class);
-
     CLibrary INSTANCE = Native.load("RosWebCtrl",CLibrary.class);
-
     //初始化函数
     void init(ResultStruct.ByReference pResultStruct,String RemoteAddr,String UserName,String Pass,String RobotId);
     //检查是否初始化
     void isInit(ResultStruct.ByReference pResultStruct,String SocketHandle);
     //获取机器人的状态
     void getRobotStatus(RobotStatusStruct.ByReference pRobotStatusStruct,String SocketHandle,String propertyName);
-
     //设置机器人属性
     void setRobotProperty(ResultStruct.ByReference pResultStruct,String SocketHandle,
                           String propertyName,String propertyValue,String dataType);
@@ -58,15 +55,26 @@ public interface CLibrary extends Library {
         public String errorCode;//代pRobotStatusStruct表错误编码
         public String errorMessage;//代表不成功的原因
         public String socketHandle;//通信socket
+
+        @Override
+        public String toString() {
+            return "ResultStruct{" +
+                    "success=" + success +
+                    ", errorCode='" + errorCode + '\'' +
+                    ", errorMessage='" + errorMessage + '\'' +
+                    ", socketHandle='" + socketHandle + '\'' +
+                    '}';
+        }
+
         //指针
         public static class ByReference extends ResultStruct implements  Structure.ByReference{}
         //结构
         public static class ByValue extends ResultStruct implements  Structure.ByValue{}
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList(new String[]{"success","errorCode","errorMessage"
-            ,"errorMessage","socketHandle"});
+            return Arrays.asList(new String[]{"success","errorCode","errorMessage","socketHandle"});
         }
+
     }
 
     //定义机器人状态结构体

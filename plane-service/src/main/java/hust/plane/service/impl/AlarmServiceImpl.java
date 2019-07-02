@@ -81,10 +81,12 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public boolean updateAlarmStatus(int alarmid) {
 
-        if (alarmMapper.updateByAlarmId(alarmid) == 1)
+        if (alarmMapper.updateByAlarmId(alarmid) == 1){
             return true;
-        else
+        }
+        else{
             return false;
+        }
 
     }
 
@@ -128,10 +130,12 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public boolean insertAlarmByAlarms(Alarm alarm) {
 
-        if (alarmMapper.insertAlarmSelective(alarm) == 1)
+        if (alarmMapper.insertAlarmSelective(alarm) == 1){
             return true;
-        else
+        }
+        else{
             return false;
+        }
 
     }
 

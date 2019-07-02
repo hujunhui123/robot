@@ -288,6 +288,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public Task getTaskByTaskId(Integer id) {
+        return taskMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
     public List<Task> getAllTaskByRole(Task task) {
 
         List<Task> taskList = taskMapper.getAllTaskByRole(task);

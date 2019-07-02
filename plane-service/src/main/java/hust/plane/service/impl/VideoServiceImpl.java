@@ -20,9 +20,11 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public boolean insertVideo(Video video) {
-        if(videoMapper.insertVideo(video) == 1)
+        if(videoMapper.insertVideo(video) == 1){
             return true;
-        else
+        }
+        else{
             return false;
+        }
     }
 }

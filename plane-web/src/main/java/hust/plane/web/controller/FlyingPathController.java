@@ -1,7 +1,6 @@
 package hust.plane.web.controller;
 
 import hust.plane.mapper.pojo.FlyingPath;
-import hust.plane.mapper.pojo.Route;
 import hust.plane.mapper.pojo.Task;
 import hust.plane.service.interFace.FlyingPathService;
 import hust.plane.service.interFace.RouteService;
@@ -10,7 +9,6 @@ import hust.plane.utils.JsonUtils;
 import hust.plane.utils.page.TailPage;
 import hust.plane.utils.pojo.JsonView;
 import hust.plane.web.controller.vo.FlyingPathVO;
-import hust.plane.web.controller.vo.RouteVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -86,17 +83,19 @@ public class FlyingPathController {
         }
 
     }
-//    //导出飞行路径kml
-//    @RequestMapping("/importPlanePath")
-//    @ResponseBody
-//    public String importPlanePath(FlyingPath flyingPath) {
-//        if (flyingPath != null) {
-//            //E:\\hello.kml
-//            String filePath = "E:\\\\" + flyingPath.getName() + ".kml";//设置文件名
-//            flyingPathServiceImpl.importFlyingPath(flyingPath, filePath);
-//        }
-//        return new JsonView(0).toString();
-//    }
+
+     //返回上传文件的页面
+    @RequestMapping("/setFlyPath")
+    public String setPath(){
+        return "uploadPGM";
+    }
+
+    //返回设置点的页面
+    @RequestMapping("/setPointPath")
+    public String setPointPath(@RequestParam(value = "pathName")String pathName,Model model){
+        model.addAttribute("pathName",pathName+".bmp");
+        return "setPath";
+    }
 
 
     //获取前台传输的路径字符串

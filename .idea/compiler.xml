@@ -12,12 +12,5 @@
         <module name="plane-web" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8">
-      <module name="plane-common" target="1.8" />
-      <module name="plane-dao" target="1.8" />
-      <module name="plane-service" target="1.8" />
-      <module name="plane-web" target="1.8" />
-      <module name="robot" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

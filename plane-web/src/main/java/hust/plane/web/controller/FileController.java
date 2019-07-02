@@ -1,9 +1,11 @@
 
 package hust.plane.web.controller;
 
+import hust.plane.mapper.pojo.FlyingPath;
 import hust.plane.service.interFace.FileService;
 import hust.plane.utils.ExcelUtil;
 import hust.plane.utils.pojo.JsonView;
+import hust.plane.web.controller.webUtils.PythonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -135,30 +138,44 @@ public class FileController {
     }
 
 
-    //测试文件上传
-//    @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
-//    @ResponseBody
-//    public String upload(@RequestParam(value = "files", required = true) MultipartFile[] files,
-//                         HttpServletRequest request) throws IOException {
-//
-//        // String path = request.getSession().getServletContext().getRealPath("upload");
-//        String path = "D:\\upload\\";
-//        if (files.length > 0) {
-//            for (int i = 0; i < files.length; i++) {
-//                String fileName = files[i].getOriginalFilename();// 获取到上传文件的名字
-//                File dir = new File(path, fileName);
-//                System.out.println(files[i].getSize());
-//                if (!dir.exists()) {
-//                    dir.mkdirs();
-//                }
-//                // 或者处理
-//                // 或者保存
-//                files[i].transferTo(dir); // MultipartFile自带的解析方法
-//            }
-//            return JsonView.render(0, "导入成功!");
-//
-//        } else {
-//            return JsonView.render(0, "导入失败，无文件!");
-//        }
-//    }
+
+    @RequestMapping(value = "/uploadMap", method = RequestMethod.POST)
+    @ResponseBody
+    public String upload(@RequestParam(value = "file", required = true) MultipartFile file,
+                         @RequestParam(value = "pathDesp")String pathDesp,
+                         HttpServletRequest request) throws IOException {
+
+        //保存到项目的文件夹中
+        String path = request.getSession().getServletContext().getRealPath("/")+"res\\upload\\";
+        String realName = file.getOriginalFilename();
+        String fileName = realName.substring(0,realName.length() - 4);
+        File dir = new File(path, realName);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        file.transferTo(dir);
+        String originPath = path+realName;
+        String targetDir = path;
+
+
+        if(PythonUtil.PGM2BMP(originPath,targetDir)){
+
+            //以照片名称作为路径名称
+            FlyingPath flyingPath = new FlyingPath();
+            flyingPath.setCreatetime(new Date());
+            flyingPath.setDescription(pathDesp);
+            flyingPath.setName(fileName);
+            if(FileServiceImpl.insetFlyingPath(flyingPath)){
+                return JsonView.render(1, fileName);
+            }else{
+                return JsonView.render(0, "插入数据库失败！");
+            }
+
+        }else{
+            return JsonView.render(0, "上传失败");
+        }
+
+
+    }
+
 }

@@ -165,12 +165,18 @@
                                         </div>
                                     </div>
                                     <div class="control-group">
+                                        <label class="control-label">密码</label>
+                                        <div class="controls">
+                                            <input type="text" class="span8" id="userpwd" auto-complete="new-password" value="">
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
                                         <label class="control-label">设备描述</label>
                                         <div class="controls">
                                             <input type="text" class="span8" id="description" auto-complete="new-password" value="">
                                         </div>
                                     </div>
-
                                     <div class="form-actions">
                                         <button type="button" class="btn blue" onclick="registerRobot()"
                                                 style="margin:auto 20px;"><i class="icon-pushpin"></i>注册
@@ -219,6 +225,7 @@
         }
         var deviceId = $("#deviceid").val();
         var description = $("#description").val();
+        var userpwd = $("#userpwd").val();
 
         $.ajax({
             type: "POST",
@@ -228,6 +235,7 @@
                 "name": name,
                 "description": description,
                 "deviceid": deviceId,
+                "password":userpwd
             },
             success: function (result) {
                 if (result.errcode == 1) {

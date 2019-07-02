@@ -79,6 +79,11 @@ public class FlyingPathServiceImpl implements FlyingPathService {
     }
 
     @Override
+    public FlyingPath getFlyingPathById(Integer flyingpathId) {
+        return flyingPathMapper.selectByFlyingPathId(flyingpathId);
+    }
+
+    @Override
     public TailPage<FlyingPath> queryFlyingPathWithPage(FlyingPath flyingPath, TailPage<FlyingPath> page) {
 
         List<FlyingPath> flyingPaths = null;
