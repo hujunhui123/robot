@@ -100,8 +100,8 @@
                                                     <td>${planepath.description!}</td>
                                                     <td>${planepath.createtime?datetime}</td>
 
-                                                    <td><a href="${s.base}/showPlanePath.action?id=${planepath.id}"
-                                                           target="_blank">详细信息</a></td>
+                                                    <#--<td><a href="${s.base}/showPlanePath.action?id=${planepath.id}"-->
+                                                           <#--target="_blank">详细信息</a></td>-->
                                                     <#if !Session["super_administrator"]?exists>
                                                     <td>
                                                         <a href="${s.base}/toTaskCreate?flyingpathId=${planepath.id}"

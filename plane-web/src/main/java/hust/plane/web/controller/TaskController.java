@@ -196,7 +196,7 @@ public class TaskController {
         }
 
         task.setName(taskVO.getName());
-        //task.setCreatetime(new Date());
+        task.setCreatetime(new Date());
         task.setUsercreator(createUser.getId());
         // 初始状态为1提交
         task.setStatus(1);
@@ -252,6 +252,7 @@ public class TaskController {
         // 初始状态为0创建
         task.setStatus(0);
         task.setFinishstatus(0);
+        task.setCreatetime(new Date());
 
         // 设置状态未完成
         if (taskServiceImpl.saveTask(task) == true) {

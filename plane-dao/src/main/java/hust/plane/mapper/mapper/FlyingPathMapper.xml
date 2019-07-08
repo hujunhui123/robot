@@ -41,6 +41,13 @@
         #{description,jdbcType=VARCHAR},#{createtime,jdbcType=TIMESTAMP},
         #{updatetime,jdbcType=TIMESTAMP},GeomFromText(#{pathdata,jdbcType=VARCHAR}),#{heightdata,jdbcType=LONGVARCHAR},#{paramOne,jdbcType=LONGVARCHAR},#{paramTwo,jdbcType=LONGVARCHAR},#{pointType,jdbcType=LONGVARCHAR})
     </insert>
+    <update id="updateFlyingPath" parameterType="hust.plane.mapper.pojo.FlyingPath">
+        update
+        K_FlyingPath
+        set
+        PathData = GeomFromText(#{pathdata,jdbcType=VARCHAR})
+        WHERE Name = #{name,jdbcType=VARCHAR}
+    </update>
 
     <select id="selectByFlyingPathId" parameterType="hust.plane.mapper.pojo.FlyingPath"
             resultMap="ResultMapWithBLOBs">

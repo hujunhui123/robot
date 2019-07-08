@@ -28,7 +28,7 @@ public class FlyingPathServiceImpl implements FlyingPathService {
 
     // 插入一条飞行路径
     @Override
-    public boolean insertFlyingPath(FlyingPath flyingPath) {
+    public boolean updateFlyingPath(FlyingPath flyingPath) {
 
         flyingPath.setPathdata("LINESTRING" + flyingPath.getPathdata());
         Date date = new Date();
@@ -36,11 +36,12 @@ public class FlyingPathServiceImpl implements FlyingPathService {
         flyingPath.setUpdatetime(date);
 
         // 然后在下面进行插入数据
-        if (flyingPathMapper.insertFlyingPath(flyingPath) == 1)
+        if (flyingPathMapper.updateFlyingPath(flyingPath) == 1)
             return true;
         else
             return false;
     }
+
 
     @Override
     public FlyingPath selectByFlyingPathId(Integer id) {

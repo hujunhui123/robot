@@ -59,9 +59,7 @@
             clearForm: true,//提交后是否清空表单数据
             data: formData,
             success: function (result) {
-                alert(result.message);
                 if (result.errcode == 1) {
-                    alert(2333);
                     window.location.href="${s.base}/setPointPath.action?pathName="+result.message;
                 } else {
                     console.log(result.message);

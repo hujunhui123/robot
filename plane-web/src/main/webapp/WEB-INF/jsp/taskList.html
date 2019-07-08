@@ -333,7 +333,7 @@
                         <input type="text" class="span4" id="robotIP">
                     </div>
                 </div>
-                <div class="control-group">
+                <!--div class="control-group">
                     <label class="control-label">用户名：</label>
                     <div class="controls">
                         <input type="text" class="span4" id="UserName" >
@@ -350,7 +350,7 @@
                     <div class="controls">
                         <input type="text" class="span4" id="robotId">
                     </div>
-                </div>
+                </div-->
             </div>
             <div class="modal-footer">
                 <input type="hidden" id="url"/>    <!-- 用于隐藏信息 -->
@@ -383,9 +383,9 @@
             url: "${s.base}/connectByTaskId.action",
             data: {
                 "RemoteAddr":$("#robotIP").val(),
-                "UserName":$("#UserName").val(),
-                "Pass":$("#UserPwd").val(),
-                "RobotId":$("#robotId").val(),
+                // "UserName":$("#UserName").val(),
+                // "Pass":$("#UserPwd").val(),
+                // "RobotId":$("#robotId").val(),
                 "TaskId":$("#connectTaskid").val()
             },
             success: function (result) {

@@ -93,7 +93,7 @@ public class FlyingPathController {
     //返回设置点的页面
     @RequestMapping("/setPointPath")
     public String setPointPath(@RequestParam(value = "pathName")String pathName,Model model){
-        model.addAttribute("pathName",pathName+".bmp");
+        model.addAttribute("pathName",pathName);
         return "setPath";
     }
 
@@ -103,11 +103,12 @@ public class FlyingPathController {
     @ResponseBody
     public String doSetFlyPath(FlyingPath flyingPath) {
 
-        if (flyingPathServiceImpl.insertFlyingPath(flyingPath) == true)
-            return "success";
+        if (flyingPathServiceImpl.updateFlyingPath(flyingPath) == true)
+            return JsonView.render(1, "上传路径成功");
         else
-            return "failed";
+            return JsonView.render(1, "上传路径失败");
     }
+
 
     //查询所有的飞行路径列表  分页查询
     @RequestMapping("/doGetFlyingPathList")

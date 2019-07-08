@@ -9,18 +9,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Created by hp on 2019/6/18.
- */
+
 //单机版测试用
 //@Controller
 public class RobotOperationController {
-   // @RequestMapping("/robotOperationInit")
-   // @ResponseBody
+
     public void robotInit(String RemoteAddr,String UserName,String Pass,String RobotId)
     {
         //封装
         //  1 个像素点是 50mm，规划地图的时候计算比例就可以
+        // 以m为单位运动
+        // 所以一个像素的距离是 0.005 m
         System.out.println("初始化：");
         CLibrary.ResultStruct.ByReference resultStruct = new CLibrary.ResultStruct.ByReference();
         CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
@@ -33,9 +32,9 @@ public class RobotOperationController {
             e.printStackTrace();
         }
 
-        System.out.println("状态：");
+        System.out.println("获取状态：");
         CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
-        CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, resultStruct.socketHandle,"tempreture");
+        CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, resultStruct.socketHandle,"ST_location");
         System.out.println(robotStatusStruct.toString());
         try {
             Thread.sleep(2000);
@@ -131,7 +130,7 @@ public class RobotOperationController {
 //        }
 //
 //        System.out.println("动一下看看：");
-//        CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.1, 45);
+//        CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.1, 45);  //单位是m
 //        System.out.println(resultStruct.toString());
 //
 //        try {

@@ -14,6 +14,8 @@ public interface FlyingPathMapper {
 
     int insertFlyingPath(FlyingPath flyingPath);
 
+    int updateFlyingPath(FlyingPath flyingPath);
+
     FlyingPath selectByFlyingPathId(Integer id);
 
     int flyingPathCount(FlyingPath flyingPath);
