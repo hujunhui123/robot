@@ -348,28 +348,26 @@ public class TaskController {
         Task take1 = taskServiceImpl.getTaskByTask(task);
         if (taskServiceImpl.setStatusTaskByTask(task, 2) == true) {
             CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(take1.getUavId());
-            //在这里连接机器人并下发路径
-            //测试下发路径
 
-            //下方代码为正式代码
-//            task = taskServiceImpl.getTaskByTask(task);
-//            FlyingPath flyingPath = flyingPathServiceImpl.getFlyingPathById(task.getFlyingpathId());
-//            ArrayList<ArrayList<Double>> points = LineUtil.stringLineToList(flyingPath.getPathdata());
-//            for(ArrayList<Double> point:points){
-//                  //把每个点都发给机器人
-//                CLibrary.INSTANCE.moveToRelativePoint(resultStruct,resultStruct.socketHandle,point.get(0), point.get(1));
-//            }
+            //如果断开连接了，则需要重新建立连接
+            if(resultStruct.socketHandle == null){
+                return JsonView.render(0, "下发路径失败，请重新连接机器人！");
+            }
 
-//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.1, 90);
-//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.2, 100);
-//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.3, 110);
-//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.4, 120);
-//            CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.5, 130);
+
+            //下方代码发送相对路径给机器人
+            task = taskServiceImpl.getTaskByTask(task);
+            FlyingPath flyingPath = flyingPathServiceImpl.getFlyingPathById(task.getFlyingpathId());
+            ArrayList<ArrayList<Double>> points = LineUtil.stringLineToList(flyingPath.getPathdata());
+            for(ArrayList<Double> point:points){
+                  //把每个点都发给机器人
+                CLibrary.INSTANCE.moveToRelativePoint(resultStruct,resultStruct.socketHandle,point.get(0), point.get(1));
+            }
 
             if(resultStruct.success){
                 return JsonView.render(1, "已下发路径！");
             }
-            return JsonView.render(1, "下发路径失败");
+            return JsonView.render(0, "下发路径失败");
         } else {
             return JsonView.render(1, "未连接,请重试!");
         }
@@ -411,55 +409,6 @@ public class TaskController {
             return JsonView.render(1, "巡视任务确认失败!");
         }
     }
-
-
-    // 下发路径    这个方法还没修改
-   /* @RequestMapping(value = "pushPathByTaskId", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public String assignTask(Task task) throws InterruptedException {
-
-        Task task2 = taskServiceImpl.getTaskByTask(task);
-        if (task2.getUserA() == null || task2.getUserA() == 0) {
-            return JsonView.render(1, "放飞员为空,任务分派失败!");
-        }
-        if (task2.getUserZ() == null || task2.getUserZ() == 0) {
-            return JsonView.render(1, "接机员为空,任务分派失败!");
-        }
-        if (task2.getFlyingpathId() == null || task2.getFlyingpathId() == 0) {
-            return JsonView.render(1, "未指定飞行路径,任务分派失败!");
-        }*/
-
-        //跨域请求创建文件夹
-//        String url = DETECT_SERVER + "makeTaskDir.action";
-//        Map<String, String> params = new HashMap<String, String>();
-//        params.put("missionId", "" + task2.getMissionId());
-//        String alarmlistString = HttpClientUtil.doPost(url, params);
-//        System.out.println(alarmlistString);
-
-        //在这里下发飞行路径有关信息！！！！@hp
-
-
-       /*  String alarmlistString = "success";
-
-        if (alarmlistString.equals("success")) {
-            User userA = userServiceImpl.getUserById(task2.getUserA());
-            User userZ = userServiceImpl.getUserById(task2.getUserZ());
-            if (taskServiceImpl.setStatusTaskByTask(task2, 2) == true) {// 设置任务分派
-
-                taskServiceImpl.updataImgFolderByTask(task2);  //写入数据库
-
-                userServiceImpl.updataTasknumByUser(userA); // 增加az任务数目
-                userServiceImpl.updataTasknumByUser(userZ);
-
-                return JsonView.render(1, "任务分派成功!");
-            } else {
-                return JsonView.render(1, "任务分派失败!");
-            }
-        } else {
-            return JsonView.render(1, "任务分派失败!");
-        }
-
-    }*/
 
     // 删除处于创建状态的任务
     @RequestMapping(value = "deleteTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -519,140 +468,99 @@ public class TaskController {
         return "plane";
     }
 
+   // public static float start = 1.0f;
+
     //向前台获取机器人的信息
-    @RequestMapping("")
+    @RequestMapping(value = "/getRobotInfo", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public RobotStatusVo getRobotStatus(@RequestParam("uavid") Integer uavid)
+    public String getRobotStatus(@RequestParam("uavid") Integer uavid)
     {
         CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
         //通过机器人设备id获取socket句柄对象
         CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct(uavid);
         RobotStatusVo statusVo = new RobotStatusVo();
-        for(int i=0;i< RobotStatusList.CmdNameList.length;i++) {
-            CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, ResultStruct.socketHandle,RobotStatusList.CmdNameList[i]);
-            String statusValue = robotStatusStruct.statusValue;
-            if(!robotStatusStruct.success)
-            {
-                break;
-            }else {
-                switch (RobotStatusList.CmdNameList[i]) {
-                    case RobotStatusList.ST_LOCATION:
-                        statusVo.setLocation(statusValue);
-                        break;
-                    case RobotStatusList.ST_DANGLE:
-                        statusVo.setdAngle(statusValue);
-                        break;
-                    case RobotStatusList.ST_SPEED:
-                        statusVo.setSpeed(statusValue);
-                        break;
-                    case RobotStatusList.ST_TEMPTURE:
-                        statusVo.setdAngle(statusValue);
-                        break;
-                    case RobotStatusList.ST_BAT_VOL:
-                        statusVo.setLocation(statusValue);
-                        break;
-                    case RobotStatusList.ST_CHR_VOL:
-                        statusVo.setdAngle(statusValue);
-                        break;
-                    case RobotStatusList.ST_CHR_STA:
-                        statusVo.setLocation(statusValue);
-                        break;
-                    case RobotStatusList.ST_WORKEDTIME: {
-                        long ulv = Long.parseLong(statusValue);
-                        int iHour = (int) (ulv / 3600);
-                        int iMunite = (int) (ulv % 3600) / 60;
-                        int iSecond = (int) (ulv % 60);
-                        statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
-                        statusVo.setWorkedTime(statusValue);
-                    }
+
+//        if(ResultStruct != null){
+            for(int i=0;i< RobotStatusList.CmdNameList.length;i++) {
+                CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, ResultStruct.socketHandle,RobotStatusList.CmdNameList[i]);
+                String statusValue = robotStatusStruct.statusValue;
+                if(!robotStatusStruct.success)
+                {
                     break;
-                    case RobotStatusList.ST_REMAINBAT:
-                        statusVo.setLocation(statusValue);
-                        break;
-                    case RobotStatusList.ST_CEMARALIFT:
-                        statusVo.setdAngle(statusValue);
-                        break;
-                    case RobotStatusList.ST_WORKEDDIS:
-                        statusVo.setLocation(statusValue);
-                        break;
-                    case RobotStatusList.ST_CTRLMODE:
-                        statusVo.setdAngle(statusValue);
-                        break;
+                }else {
+                    switch (RobotStatusList.CmdNameList[i]) {
+                        case RobotStatusList.ST_LOCATION:
+                            statusVo.setLocation(statusValue);
+                            break;
+                        case RobotStatusList.ST_DANGLE:
+                            statusVo.setdAngle(statusValue);
+                            break;
+                        case RobotStatusList.ST_SPEED:
+                            statusVo.setSpeed(statusValue);
+                            break;
+                        case RobotStatusList.ST_TEMPTURE:
+                            statusVo.setTempreture(statusValue);
+                            break;
+                        case RobotStatusList.ST_BAT_VOL:
+                            statusVo.setBatteryVoltage(statusValue);
+                            break;
+                        case RobotStatusList.ST_CHR_VOL:
+                            statusVo.setChargeVoltage(statusValue);
+                            break;
+                        case RobotStatusList.ST_CHR_STA:
+                            statusVo.setChargeStatus(statusValue);
+                            break;
+                        case RobotStatusList.ST_WORKEDTIME: {
+                            long ulv = Long.parseLong(statusValue);
+                            int iHour = (int) (ulv / 3600);
+                            int iMunite = (int) (ulv % 3600) / 60;
+                            int iSecond = (int) (ulv % 60);
+                            statusValue = iHour + "小时" + iMunite + "分" + iSecond + "秒";
+                            statusVo.setWorkedTime(statusValue);
+                        }
+                            break;
+                        case RobotStatusList.ST_REMAINBAT:
+                            statusVo.setRemainBattery(statusValue);
+                            break;
+                        case RobotStatusList.ST_REMAINTIME:
+                            statusVo.setRemainTime(statusValue);
+                            break;
+                        case RobotStatusList.ST_CEMARALIFT:
+                            statusVo.setCemaraLift(statusValue);
+                            break;
+                        case RobotStatusList.ST_WORKEDDIS:
+                            statusVo.setWorkedDis(statusValue);
+                            break;
+                        case RobotStatusList.ST_CTRLMODE:
+                            statusVo.setControlMode(statusValue);
+                            break;
+                        case RobotStatusList.ST_LED:
+                            statusVo.setLed(statusValue);
+                        default:break;
+                    }
                 }
             }
-        }
-        return statusVo;
+//        }else {
+//            String location = "("+start+","+start+")";
+//            //statusVo.setLocation("(2.000,2.000)");
+//            statusVo.setLocation(location);
+//            statusVo.setdAngle("0.000");
+//            statusVo.setSpeed("0.3m/s");
+//            statusVo.setTempreture("50");
+//            statusVo.setBatteryVoltage("47.6v");
+//            statusVo.setChargeVoltage("48v");
+//            statusVo.setChargeStatus("false");
+//            statusVo.setWorkedTime("0时21分32秒");
+//            statusVo.setRemainBattery("34%");
+//            statusVo.setRemainTime("123s");
+//            statusVo.setCemaraLift("开");
+//            statusVo.setWorkedDis("未知");
+//            statusVo.setControlMode("自动");
+//            statusVo.setLed("false");
+//            start = start+0.1f;
+//        }
+       return JsonView.render(1, "查询成功",statusVo);
     }
-
-
-    /**
-     * 人员动态搜索提示
-     */
-    /*@RequestMapping(value = "searchFlyer", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    @ResponseBody
-    public String searchFlyerTips(@RequestParam(value = "queryString") String queryString,@RequestParam(value="departmentId") String departmentId) {
-        List<String> userNameList = new ArrayList<>();
-        try {
-            List<User> bUserList = userServiceImpl.fuzzySearchWithUser(queryString,departmentId);
-            for (User user : bUserList) {
-                userNameList.add(user.getName());
-            }
-        } catch (Exception e) {
-            String msg = "用户模糊搜素失败";
-            if (e instanceof TipException) {
-                msg = e.getMessage();
-            } else {
-                LOGGER.error(msg, e);
-            }
-            return JsonView.render(1, msg);
-        }
-        return JsonView.render(0, WebConst.SUCCESS_RESULT, userNameList);
-    }*/
-
-    // 获取任务的告警信息,同时显示告警信息
-    /*@RequestMapping(value = "alarmWithId", method = RequestMethod.GET)
-    public String getAlarmWithId(@RequestParam(value = "id") int id, Model model) {
-        Task task = new Task();
-        task.setId(id);
-        Task task1 = taskServiceImpl.getTaskByTask(task);
-
-        String flyingPathName = flyingPathServiceImpl.getNameById(task1.getFlyingpathId());
-
-        Uav uav = new Uav();
-        uav.setId(task1.getUavId());
-        Uav uav1 = uavServiceImpl.getPlaneByPlane(uav);
-
-        List<Alarm> alarmWitIdList = alarmService.getAlarmsByTaskId(Integer.valueOf(id));
-        List<AlarmDetailVO> alarmDetailVOList = new ArrayList<AlarmDetailVO>();
-
-        String userCreatorName = userServiceImpl.getNameByUserId(task1.getUsercreator());
-        String userAName = userServiceImpl.getNameByUserId(task1.getUserA());
-        String userZName = userServiceImpl.getNameByUserId(task1.getUserZ());
-        Iterator<Alarm> iterator = alarmWitIdList.iterator();
-
-        while (iterator.hasNext()) {
-            Alarm alarm = iterator.next();
-            AlarmDetailVO alarmDetailVO = new AlarmDetailVO(alarm);
-            alarmDetailVO.setUav(uav1);
-            //设置来自图片服务器的数据
-            alarmDetailVO.setImage(BASE_IMAGE_URL + imgPath + task1.getMissionId() + "/" + IMAGE_ALARM + alarmDetailVO.getImage());
-
-            alarmDetailVO.setTaskName(task1.getName());
-            alarmDetailVO.setFlyingPathName(flyingPathName);
-            alarmDetailVO.setUserCreatorName(userCreatorName);
-            alarmDetailVO.setUserAName(userAName);
-            alarmDetailVO.setUserZName(userZName);
-
-            alarmDetailVOList.add(alarmDetailVO);
-        }
-        FlyingPath flyingPath = flyingPathServiceImpl.selectByFlyingPathId(task1.getFlyingpathId());
-        FlyingPathVO flyingPathVO = new FlyingPathVO(flyingPath);
-
-        model.addAttribute("flyingPath", JsonUtils.objectToJson(flyingPathVO));
-        model.addAttribute("alarmList", JsonUtils.objectToJson(alarmDetailVOList));
-
-        return "alarmListWithTaskId";
-    }*/
 
 
 }

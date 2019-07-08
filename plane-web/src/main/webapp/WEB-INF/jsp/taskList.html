@@ -328,7 +328,7 @@
             </div>
             <div class="modal-body" style="">
                 <div class="control-group">
-                    <label class="control-label">IP地址：</label>
+                    <label class="control-label">该机器人IP地址：</label>
                     <div class="controls">
                         <input type="text" class="span4" id="robotIP">
                     </div>
@@ -420,6 +420,9 @@
                     document.getElementById("resText").innerHTML = result.message;
                     Modal.show('ocDialogModal');
                     setTimeout("document.location.reload();", 2000);
+                }else{
+                    document.getElementById("resText").innerHTML = result.message;
+                    Modal.show('ocDialogModal');
                 }
             }
         });

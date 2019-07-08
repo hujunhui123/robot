@@ -17,7 +17,7 @@ public class RobotStatusVo {
     private String cemaraLift;
     private String WorkedDis;
     private String controlMode;
-
+    private String led;
 
     @Override
     public String toString() {
@@ -35,6 +35,7 @@ public class RobotStatusVo {
                 ", cemaraLift='" + cemaraLift + '\'' +
                 ", WorkedDis='" + WorkedDis + '\'' +
                 ", controlMode='" + controlMode + '\'' +
+                ", led='" + led + '\'' +
                 '}';
     }
 
@@ -140,6 +141,14 @@ public class RobotStatusVo {
 
     public void setControlMode(String controlMode) {
         this.controlMode = controlMode;
+    }
+
+    public String getLed() {
+        return led;
+    }
+
+    public void setLed(String led) {
+        this.led = led;
     }
 
 }

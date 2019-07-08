@@ -12,10 +12,6 @@
     <script src="http://cache.amap.com/lbs/static/es5.min.js"></script>
     <script type="text/javascript" src='//webapi.amap.com/maps?v=1.4.6&key=82f9e75505b649be9ab81a45ae34aa14'></script>
 
-    <#--<script type="text/javascript" src="${s.base}/res/js/WGS84_to_GCJ02.js"></script>-->
-    <script type="text/javascript" src="${s.base}/res/js/home.js"></script>
-    <#--<script type="text/javascript" src="${s.base}/res/js/chat.js"></script>-->
-
     <link href="${s.base}/res/assets/video-js.css" rel="stylesheet"/>
     <script src="${s.base}/res/assets/videojs-ie8.min.js"></script>
 
@@ -93,9 +89,9 @@
     }
 
     #container{
-        /*text-align: center;*/
-        position: relative;
-        margin-top: 5px;
+        /*position: relative;*/
+        margin-top: 0;
+        nargin-left:0;
     }
     #myCanvas{
         border:1px solid red;
@@ -113,9 +109,9 @@
 <input type="hidden" id="base" value="${s.base}"><br/>
 <input type="hidden" id="plane" value="${uav2.deviceid!}"><br/>
 <input type="hidden" id="peoplerole" value="${role!}"><br/>
-<div class="headerUav" style="font-size:2.0rem;">
-    <font size="4">机器人状态：<span id="fightStatus">暂未连接</span></font>
-</div>
+<#--<div class="headerUav" style="font-size:2.0rem;">-->
+    <#--<font size="4">机器人状态：<span id="fightStatus">暂未连接</span></font>-->
+<#--</div>-->
 
 
 <div id="container">
@@ -156,24 +152,26 @@
     <div class="flyingInfo">
         <ul class="list-group">
             <li class="list-group-item liheader"><b>机器人信息</b></li>
-            <li class="list-group-item">速度(m/s)：<span id="fightArSpd"></span></li>
-            <li class="list-group-item">当前温度：<span id="fightGrSpd"></span></li>
-            <li class="list-group-item">电池电压(v)：<span id="fightLat"></span></li>
-            <li class="list-group-item">充电电压(v)：<span id="fightLon"></span></li>
-            <li class="list-group-item">充电状态：<span id="fightElv"></span></li>
-            <li class="list-group-item">已工作时间：<span id="fightHDG"></span></li>
-            <li class="list-group-item">剩余电量(%)：<span id="fightHAgl"></span></li>
-            <li class="list-group-item">预计剩余时间：<span id="fightGrVAgl"></span></li>
-            <li class="list-group-item">升降杆状态：<span id="fightGanStatus"></span></li>
-            <li class="list-group-item">运行里程：<span id="fightDistance"></span></li>
-            <li class="list-group-item">工作模式：<span id="fightPattern"></span></li>
+            <li class="list-group-item">底盘角度：<span id="ST_dAngle"></span></li>
+            <li class="list-group-item">速度(m/s)：<span id="ST_speed"></span></li>
+            <li class="list-group-item">当前温度：<span id="ST_tempreture"></span></li>
+            <li class="list-group-item">电池电压(V)：<span id="ST_batteryVoltage"></span></li>
+            <li class="list-group-item">充电电压(V)：<span id="ST_chargeVoltage"></span></li>
+            <li class="list-group-item">充电状态：<span id="ST_chargeStatus"></span></li>
+            <li class="list-group-item">已工作时间：<span id="ST_workedTime"></span></li>
+            <li class="list-group-item">剩余电量(%)：<span id="ST_remainBattery"></span></li>
+            <li class="list-group-item">预计剩余时间：<span id="ST_remainTime"></span></li>
+            <li class="list-group-item">升降杆状态：<span id="ST_cemaraLift"></span></li>
+            <li class="list-group-item">运行里程：<span id="ST_WorkedDis"></span></li>
+            <li class="list-group-item">工作模式：<span id="ST_controlMode"></span></li>
+            <li class="list-group-item">Led灯：<span id="ST_led"></span></li>
         </ul>
     </div>
 </div>
 
 
 <!-- UI组件库 1.0 -->
-<script src="${s.base}/res/assets/video.js"></script>
+<#--<script src="${s.base}/res/assets/video.js"></script>-->
 <script>
     //拖拽原理：改变obj的top值与left值
     function drag() {
@@ -250,14 +248,12 @@
     }
 
     drag();
-
-
 </script>
 <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
 <script type="text/javascript">
     var uavdata = ${uav};
     var flyingPath = ${path};
-    var robotid = uavdata.deviceid;
+
     $("#flyingPathName").html(flyingPath.name);
     $("#uavDeviceId").html(uavdata.deviceid);
     $("#uavName").html(uavdata.name);
@@ -273,20 +269,41 @@
     //设置画布的背景图
     $("#bg").attr('src',img_url);
 
+
+    var myCanvas = document.getElementById('myCanvas');
+    var ctx = myCanvas.getContext("2d");
+    ctx.fillStyle = "rgb(255, 140, 0)";
+
     function SendXHR() {
         $.ajax({
             type: "post",
             url: "${s.base}/getRobotInfo.action",
+            dataType: 'json',
             data:{
-                "uavid":robotid,
+                "uavid":uavdata.id
             },
-            cache: false,
-            timeout: 1000 * 80,  //AJAX请求超时时间为60秒
             success: function (res) {
-                //var t=setTimeout("alert(robotid)",1000);
-                //alert(1);
-                console.log(res);
-                //SendXHR();//请求后立即发起AJAX请求
+                $("#ST_dAngle").text(res.data.dAngle+"");
+                $("#ST_speed").text(res.data.speed);
+                $("#ST_tempreture").text(res.data.tempreture);
+                $("#ST_batteryVoltage").text(res.data.batteryVoltage);
+                $("#ST_chargeVoltage").text(res.data.chargeVoltage);
+                $("#ST_chargeStatus").text(res.data.chargeStatus);
+                $("#ST_workedTime").text(res.data.workedTime);
+                $("#ST_remainBattery").text(res.data.remainBattery);
+                $("#ST_remainTime").text(res.data.remainTime);
+                $("#ST_cemaraLift").text(res.data.cemaraLift);
+                $("#ST_WorkedDis").text(res.data.WorkedDis);
+                $("#ST_controlMode").text(res.data.controlMode);
+                $("#ST_led").text(res.data.led);
+
+                //把定位数据描点 1m = 20像素
+                var pointData = res.data.location.replace("(","").replace(")","");
+                var xAndy = pointData.split(",");
+                ctx.beginPath();
+                ctx.arc(parseFloat(xAndy[0]*20), parseFloat(xAndy[1]*20), 2, Math.PI * 2, 0, true);
+                ctx.closePath();
+                ctx.fill();
             },
             error: function () {
                 console.log("机器人数据查询失败");
@@ -295,11 +312,26 @@
         });
     }
 
-   // setInterval(SendXHR,2000);
+     setInterval(SendXHR,3000);
 
-    // window.onload = function () {
-    //     SendXHR();
-    // }
+     // window.onload = function () {
+     //    // setTimeout("console.log('停一下')",3000);
+     //     SendXHR();
+     // }
+
+    //获取元素的纵坐标,相对于浏览器的左上角
+    function getY(e) {
+        var offset = e.offsetTop;
+        if (e.offsetParent != null) offset += getY(e.offsetParent);
+        return offset;
+    }
+
+    //获取元素的横坐标，相对于浏览器的右上角
+    function getX(e) {
+        var offset = e.offsetLeft;
+        if (e.offsetParent != null) offset += getX(e.offsetParent);
+        return offset;
+    }
 
 </script>
 
