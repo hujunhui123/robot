@@ -347,7 +347,7 @@ public class TaskController {
 
         Task take1 = taskServiceImpl.getTaskByTask(task);
         if (taskServiceImpl.setStatusTaskByTask(task, 2) == true) {
-            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(take1.getUavId());
+            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(take1.getUavId()+"");
 
             //如果断开连接了，则需要重新建立连接
             if(resultStruct.socketHandle == null){
@@ -383,7 +383,7 @@ public class TaskController {
         Task task = new Task();
         task.setId(id);
         if (taskServiceImpl.setStatusTaskByTask(task, 3) == true) {
-            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId);
+            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId+"");
             //调用startTask函数
             CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,id+"");
             return JsonView.render(1, "巡检开始！");
@@ -401,7 +401,7 @@ public class TaskController {
         task.setId(id);
         if( taskServiceImpl.setStatusTaskByTask(task, 4)){
             //在这里让机器人结束巡检
-            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId);
+            CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId+"");
             //调用结束任务函数
             CLibrary.INSTANCE.stopTask(resultStruct,resultStruct.socketHandle);
             return JsonView.render(1, "巡视任务确认完成!");
@@ -477,7 +477,7 @@ public class TaskController {
     {
         CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
         //通过机器人设备id获取socket句柄对象
-        CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct(uavid);
+        CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct(uavid+"");
         RobotStatusVo statusVo = new RobotStatusVo();
 
 //        if(ResultStruct != null){

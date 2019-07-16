@@ -16,9 +16,9 @@ public class RobotManager {
         resultStructMap.put(robotId,r);
     }
     //获得
-    public static CLibrary.ResultStruct.ByReference getResultStruct(int robotId)
+    public static CLibrary.ResultStruct.ByReference getResultStruct(String robotId)
     {
-        return resultStructMap.get(robotId+"");
+        return resultStructMap.get(robotId);
     }
 
 
