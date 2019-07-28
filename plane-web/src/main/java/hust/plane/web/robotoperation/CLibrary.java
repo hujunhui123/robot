@@ -26,7 +26,7 @@ public interface CLibrary extends Library {
     //设置机器人属性
     void setRobotProperty(ResultStruct.ByReference pResultStruct,String SocketHandle,
                           String propertyName,String propertyValue,String dataType);
-    //移动机器人到指定点
+    //移动机器人到指定点   该方法似乎有点问题，动不了
     void moveToPoint(ResultStruct.ByReference pResultStruct, String SocketHandle, double dx, double dy);
     //移动机器人到相对位置
     void moveToRelativePoint(ResultStruct.ByReference pResultStruct, String SocketHandle, double dDistance, double dAngle);
@@ -108,8 +108,8 @@ public interface CLibrary extends Library {
         public double dx;//目标点的x坐标
         public double dy;//目标点的y坐标
         public double aAngle;//底盘的角度
-        double roadWith;//当前点到目标点之间连线的最小距离
-        boolean raiseLift ;//升降杆是否升起
+        public double roadWith;//当前点到目标点之间连线的最小距离
+        public boolean raiseLift ;//升降杆是否升起
         //指针
         public static class ByReference extends CheckPointStruct implements  Structure.ByReference{}
         //结构

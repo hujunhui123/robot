@@ -21,6 +21,15 @@ public class RobotOperationController {
         // 以m为单位运动
         // 所以一个像素的距离是 0.005 m
         System.out.println("初始化：");
+
+        CLibrary.CheckPointStruct.ByReference[] pointssss = new  CLibrary.CheckPointStruct.ByReference[2];
+        pointssss[0] =  new CLibrary.CheckPointStruct.ByReference();
+        pointssss[1] =  new CLibrary.CheckPointStruct.ByReference();
+
+
+        byte [] a = "as".getBytes();
+        System.arraycopy(a,0,pointssss[0].batchId,0,a.length);
+
         CLibrary.ResultStruct.ByReference resultStruct = new CLibrary.ResultStruct.ByReference();
         CLibrary.INSTANCE.init(resultStruct,RemoteAddr,UserName,Pass,RobotId);
 
@@ -32,7 +41,7 @@ public class RobotOperationController {
             e.printStackTrace();
         }
 
-        System.out.println("获取状态：");
+        /*System.out.println("获取状态：");
         //通过机器人设备id获取socket句柄对象
         //CLibrary.ResultStruct.ByReference ResultStruct = RobotManager.getResultStruct("123");
         RobotStatusVo statusVo = new RobotStatusVo();
@@ -105,9 +114,11 @@ public class RobotOperationController {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,"1234");
+
+
+//        CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,"1234");
         System.out.println("启动：");
         System.out.println(resultStruct.toString());
 
@@ -121,12 +132,18 @@ public class RobotOperationController {
         CLibrary.INSTANCE.moveToRelativePoint(resultStruct, resultStruct.socketHandle,0.1, 45);  //单位是m
         System.out.println(resultStruct.toString());
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("结束任务：");
+        System.out.println("回转角度：");
+        CLibrary.INSTANCE.rotateToAngle(resultStruct,resultStruct.socketHandle,0);
+        System.out.println(resultStruct.toString());
+
+
+//
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("结束任务：");
         //调用结束任务函数
         CLibrary.INSTANCE.stopTask(resultStruct,resultStruct.socketHandle);
         System.out.println(resultStruct.toString());
@@ -137,6 +154,7 @@ public class RobotOperationController {
     public static void main(String[] args){
       RobotOperationController  robotOperationController = new RobotOperationController();
       robotOperationController.robotInit("10.12.137.81","ROS","ROS","123");
+
     }
 
 }

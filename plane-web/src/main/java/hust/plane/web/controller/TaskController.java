@@ -14,6 +14,7 @@ import hust.plane.web.controller.vo.FlyingPathVO;
 import hust.plane.web.controller.vo.RobotStatusVo;
 import hust.plane.web.controller.vo.TaskVO;
 import hust.plane.web.controller.vo.UavVO;
+import hust.plane.web.controller.webUtils.RobotUtil;
 import hust.plane.web.robotoperation.CLibrary;
 import hust.plane.web.robotoperation.RobotManager;
 import hust.plane.web.robotoperation.RobotStatusList;
@@ -354,14 +355,34 @@ public class TaskController {
                 return JsonView.render(0, "下发路径失败，请重新连接机器人！");
             }
 
-
             //下方代码发送相对路径给机器人
             task = taskServiceImpl.getTaskByTask(task);
             FlyingPath flyingPath = flyingPathServiceImpl.getFlyingPathById(task.getFlyingpathId());
             ArrayList<ArrayList<Double>> points = LineUtil.stringLineToList(flyingPath.getPathdata());
+
+            //查询机器人获得机器人当前位置
+            CLibrary.RobotStatusStruct.ByReference robotStatusStruct = new CLibrary.RobotStatusStruct.ByReference();
+            CLibrary.INSTANCE.getRobotStatus(robotStatusStruct, resultStruct.socketHandle,RobotStatusList.ST_LOCATION);
+            String locationValue = robotStatusStruct.statusValue;
+            String[] location = locationValue.replaceAll("[()]","").split(",");
+
+            //记录机器人的初始位置,把位置换成正数
+            ArrayList<Double> start = new ArrayList<>();
+            start.add(Double.parseDouble(location[0]));
+            start.add(Double.parseDouble(location[1]));
+
+            //根据初始位置发送坐标给机器人
             for(ArrayList<Double> point:points){
-                  //把每个点都发给机器人
-                CLibrary.INSTANCE.moveToRelativePoint(resultStruct,resultStruct.socketHandle,point.get(0), point.get(1));
+
+                //每次归回原位，相当于X轴0度的位置，用于重新计算角度
+                point.set(1,point.get(1)*(-1));  //把负号返回去
+                Double distance = RobotUtil.getDistance(Math.abs(start.get(0)), start.get(1), point.get(0), point.get(1));
+                Double angle = RobotUtil.getAngle(point.get(0),point.get(1));
+                //把每个点都发给机器人  double dDistance, double dAngle
+                CLibrary.INSTANCE.moveToRelativePoint(resultStruct,resultStruct.socketHandle,distance,angle);
+                //start指向当前点
+                start = point;
+                CLibrary.INSTANCE.rotateToAngle(resultStruct,resultStruct.socketHandle,angle*(-1.0));
             }
 
             if(resultStruct.success){
@@ -378,14 +399,14 @@ public class TaskController {
     // 启动机器人巡检
     @RequestMapping(value = "startTask", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String startTask(int id,Integer robotId) {
+    public String startTask(@RequestParam("id")Integer id,@RequestParam("robotId")Integer robotId) {
 
         Task task = new Task();
         task.setId(id);
         if (taskServiceImpl.setStatusTaskByTask(task, 3) == true) {
             CLibrary.ResultStruct.ByReference resultStruct = RobotManager.getResultStruct(robotId+"");
             //调用startTask函数
-            CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,id+"");
+            CLibrary.INSTANCE.startTask(resultStruct,resultStruct.socketHandle,"1234");
             return JsonView.render(1, "巡检开始！");
         } else {
             return JsonView.render(1, "机器人启动失败，请重试!");
@@ -395,7 +416,7 @@ public class TaskController {
 
     @RequestMapping(value = "onsureTaskOver", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String onsureTaskOver(int id,Integer robotId, HttpServletRequest request) {
+    public String onsureTaskOver(@RequestParam("id")Integer id,@RequestParam("robotId")Integer robotId, HttpServletRequest request) {
 
         Task task = new Task();
         task.setId(id);
@@ -490,6 +511,7 @@ public class TaskController {
                 }else {
                     switch (RobotStatusList.CmdNameList[i]) {
                         case RobotStatusList.ST_LOCATION:
+                            System.out.println(statusValue);
                             statusVo.setLocation(statusValue);
                             break;
                         case RobotStatusList.ST_DANGLE:
